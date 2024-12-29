@@ -4,11 +4,58 @@
 
 {% block title %}{{ title }} | {{ site_header|default:_('Django site admin') }}{% endblock %}
 
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    :root {
+        --primary: #79aec8;
+        --secondary: #417690;
+        --accent: #f5dd5d;
+        --primary-fg: #fff;
+        --header-color: var(--primary-fg);
+        --header-branding-color: var(--accent);
+        --header-bg: var(--secondary);
+        --header-link-color: var(--primary-fg);
+    }
+    
+    #header {
+        background: var(--header-bg);
+        color: var(--header-color);
+        height: auto;
+        padding: 15px 40px;
+    }
+    
+    #branding h1 {
+        color: var(--header-branding-color);
+        margin: 0;
+        font-weight: 300;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+    }
+    
+    #branding h1 img {
+        height: 40px;
+        margin-right: 10px;
+        display: inline-block;
+        vertical-align: middle;
+    }
+    
+    #branding h1, #branding h1 a:link, #branding h1 a:visited {
+        color: var(--header-branding-color);
+    }
+    
+    #header a:link, #header a:visited {
+        color: var(--header-link-color);
+    }
+</style>
+{% endblock %}
+
 {% block branding %}
 <h1 id="site-name">
     <a href="{% url 'admin:index' %}">
-        <img src="{% static 'img/logo.png' %}" alt="Evangelhos Aramaico Siríaco" height="40" style="margin-right: 10px;">
-        Administração
+        <img src="{% static 'img/logo.png' %}" alt="Evangelhos Aramaico Siríaco">
+        <span>Administração</span>
     </a>
 </h1>
 {% endblock %}

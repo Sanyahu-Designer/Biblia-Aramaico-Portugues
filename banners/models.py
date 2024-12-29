@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from PIL import Image
 import os
 import logging
+from django.conf import settings
 
 # Create your models here.
 
@@ -92,10 +93,9 @@ class Banner(models.Model):
         self.refresh_from_db()
 
     def get_image_url(self):
-        if self.imagem:
-            filename = os.path.basename(self.imagem.name)
-            return f'/banners/media/banners/{filename}'
-        return ''
+        if settings.DEBUG:
+            return f"{settings.MEDIA_URL}banners/{self.imagem.name.split('/')[-1]}"
+        return f"https://staging.sanyahudesigner.com.br/media/banners/{self.imagem.name.split('/')[-1]}"
 
     def to_dict(self):
         return {

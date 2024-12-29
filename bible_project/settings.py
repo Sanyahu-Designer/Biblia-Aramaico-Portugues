@@ -124,12 +124,10 @@ SITE_URL = 'https://staging.sanyahudesigner.com.br'
 
 # Configuração de arquivos estáticos
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# Diretórios de arquivos estáticos
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Configuração dos finders de arquivos estáticos
 STATICFILES_FINDERS = [
@@ -137,9 +135,34 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
-# Configuração de arquivos de mídia
+# Em produção, use o domínio correto
+if not DEBUG:
+    STATIC_URL = 'https://staging.sanyahudesigner.com.br/static/'
+
+# Configuração de mídia
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/home/netsarim/staging/media'  # Caminho absoluto em produção
+
+# Configuração do MEDIA_ROOT baseada no ambiente
+if DEBUG:
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+else:
+    # Caminho de produção
+    MEDIA_ROOT = '/home/netsarim/staging/media'
+
+# Certifique-se que os diretórios existem
+os.makedirs(MEDIA_ROOT, exist_ok=True)
+os.makedirs(os.path.join(MEDIA_ROOT, 'banners'), exist_ok=True)
+
+# Permissões dos diretórios em produção
+if not DEBUG:
+    try:
+        import stat
+        # Define permissões 755 para MEDIA_ROOT
+        os.chmod(MEDIA_ROOT, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+        # Define permissões 755 para o diretório banners
+        os.chmod(os.path.join(MEDIA_ROOT, 'banners'), stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+    except Exception as e:
+        print(f"Aviso: Não foi possível definir permissões: {e}")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -187,59 +210,63 @@ LOGGING = {
     },
 }
 
-# Configurações do Jazzmin
+# Configurações do Admin
 JAZZMIN_SETTINGS = {
-    "site_title": "Aramaico/Português",
-    "site_header": "Aramaico/Português",
-    "site_brand": "Aramaico/Português",
-    "site_logo": "img/logo2.png",
-    "login_logo": "img/logo3.png",
-    "login_logo_dark": "img/logo.png",
+    # title of the window (Will default to current_admin_site.site_title if absent or None)
+    "site_title": "Evangelhos Aramaico Siríaco",
+    # Title on the login screen (19 chars max) (will default to current_admin_site.site_header if absent or None)
+    "site_header": "EAS Admin",
+    # Title on the brand (19 chars max) (will default to current_admin_site.site_header if absent or None)
+    "site_brand": "EAS",
+    # Logo to use for your site, must be present in static files
+    "site_logo": "img/logo.png",
+    # Logo to use for login form in dark themes
+    "login_logo": "img/logo.png",
+    # CSS classes that are applied to the logo
     "site_logo_classes": "img-circle",
+    # Relative path to a favicon for your site, will default to site_logo if absent
     "site_icon": "img/favicon-32x32.png",
-    "welcome_sign": "Bem-vindo ao Painel Administrativo",
-    "copyright": "Aramaico/Português",
-    "custom_links": {
-        "books": [{
-            "name": "Ir para o Site",
-            "url": "/",
-            "icon": "fas fa-home",
-        }],
-    },
-    "topmenu_links": [
-        {"name": "Início", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Site", "url": "/", "new_window": True},
-        {"name": "Dicionário", "url": "/dictionary", "new_window": True},
-    ],
-    "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "bible_app.book": "fas fa-book",
-        "bible_app.chapter": "fas fa-bookmark",
-        "bible_app.verse": "fas fa-quote-right",
-        "dictionary_app.aramaicword": "fas fa-language",
-    },
+    # Welcome text on the login screen
+    "welcome_sign": "Bem-vindo ao Evangelhos Aramaico Siríaco",
+    # Copyright on the footer
+    "copyright": "Evangelhos Aramaico Siríaco",
+    # The model admin to search from the search bar
+    "search_model": "auth.User",
+    # Field name on user model that contains avatar ImageField/URLField/Charfield or a callable that receives the user
+    "user_avatar": None,
     "show_sidebar": True,
     "navigation_expanded": True,
     "hide_apps": [],
     "hide_models": [],
-    "order_with_respect_to": ["auth", "bible_app", "dictionary_app"],
+    "custom_links": {},
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    "related_modal_active": False,
+    "custom_css": None,
+    "custom_js": None,
+    "show_ui_builder": False,
     "changeform_format": "horizontal_tabs",
-    "related_modal_active": True,
+    "changeform_format_overrides": {"auth.user": "collapsible", "auth.group": "vertical_tabs"},
 }
 
 JAZZMIN_UI_TWEAKS = {
-    "navbar": "navbar-white navbar-light",
-    "no_navbar_border": True,
-    "body_small_text": False,
     "navbar_small_text": False,
     "footer_small_text": False,
-    "brand_small_text": True,
+    "body_small_text": False,
+    "brand_small_text": False,
     "brand_colour": False,
     "accent": "accent-primary",
+    "navbar": "navbar-white navbar-light",
+    "no_navbar_border": True,
     "navbar_fixed": False,
+    "layout_boxed": False,
     "footer_fixed": False,
-    "sidebar_fixed": True,
+    "sidebar_fixed": False,
     "sidebar": "sidebar-light-primary",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
@@ -248,4 +275,13 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": True,
     "theme": "flatly",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-outline-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-outline-info",
+        "warning": "btn-outline-warning",
+        "danger": "btn-outline-danger",
+        "success": "btn-outline-success"
+    }
 }

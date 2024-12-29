@@ -50,29 +50,18 @@ def get_next_banner(request):
         # Seleciona um banner aleatório
         banner = banners.order_by('?').first()
         
-        if banner:
-            # Salva o ID do banner atual como último mostrado
-            cache.set(last_banner_key, banner.id, timeout=300)  # 5 minutos
-            
-            # Incrementa visualização
-            banner.incrementar_visualizacao()
-            
-            # Prepara os dados do banner
-            banner_data = {
-                'id': banner.id,
-                'imagem': f"{settings.SITE_URL}{settings.MEDIA_URL}banners/{os.path.basename(banner.imagem.name)}",
-                'link': banner.link,
-                'posicao': banner.posicao
-            }
-            
-            # Cache dos dados do banner
-            cache.set(cache_key, banner_data, timeout=300)  # 5 minutos
-            return JsonResponse(banner_data)
-            
-        return JsonResponse({'error': 'Nenhum banner disponível'}, status=404)
-            
+        # Atualiza o cache com o ID do banner atual
+        cache.set(last_banner_key, banner.id, 300)  # 5 minutos
+        
+        # Retorna os dados do banner
+        return JsonResponse({
+            'id': banner.id,
+            'imagem': banner.get_image_url(),
+            'link': banner.link,
+            'posicao': banner.posicao
+        })
     except Exception as e:
-        logger.error(f'Error in get_next_banner: {str(e)}')
+        logger.error(f"Erro ao buscar banner: {e}")
         return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_protect

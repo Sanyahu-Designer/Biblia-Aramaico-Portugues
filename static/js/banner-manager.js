@@ -95,11 +95,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="banner-content">
                     <button type="button" class="close-button">&times;</button>
                     <a href="${banner.link}" target="_blank" class="banner-inner" onclick="registerClick(${banner.id})">
-                        <img src="${banner.imagem}" alt="Banner Publicitário">
+                        <img src="${banner.imagem}" alt="Banner Publicitário" onerror="this.style.display='none'">
                     </a>
                 </div>
             `;
 
+            // Adiciona evento de clique no botão de fechar
             const closeButton = div.querySelector('.close-button');
             closeButton.onclick = function(e) {
                 e.preventDefault();
@@ -110,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             currentBannerId = banner.id;
             return div;
         } catch (error) {
-            console.error('Error loading banner image:', error);
+            console.error('Error creating banner:', error);
             return null;
         }
     }
