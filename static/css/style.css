@@ -1,0 +1,648 @@
+/**
+ * PADRÃO OFICIAL DE CORES - NÃO ALTERAR
+ * 
+ * Tema Light:
+ * - Navbar/Footer: #4682b4 (Steel Blue)
+ * - Form Select: #f5f5f5
+ * - Dropdown Menu: #f8f9fa
+ * - Card Background: #ffffff
+ * - Card Header: #f8f9fa
+ * 
+ * Tema Dark:
+ * - Navbar/Footer: #2b3035
+ * - Background: #212529
+ * - Card Background: #2b3035
+ * - Card Header: #343a40
+ * 
+ * IMPORTANTE: Estas cores são o padrão oficial da aplicação.
+ * Não devem ser alteradas em nenhuma circunstância para manter
+ * a consistência visual em toda a plataforma.
+ */
+
+/* Variáveis de cores */
+:root {
+    /* Cores padrão (light) */
+    --primary: #0d6efd;
+    --primary-hover: #0b5ed7;
+    --bg-light: #ffffff;
+    --text-light: #212529;
+    --border-light: #dee2e6;
+    --input-bg-light: #ffffff;
+    --card-bg-light: #ffffff;
+    --card-header-light: #f8f9fa;
+    --navbar-light: #346dc1;
+    --footer-light: #346dc1;
+    --footer-text-light: #ffffff;
+    
+    /* Cores do tema dark */
+    --primary-dark: #0d6efd;
+    --primary-dark-hover: #0b5ed7;
+    --bg-dark: #212529;
+    --text-dark: #e9ecef;
+    --border-dark: #495057;
+    --input-bg-dark: #2b3035;
+    --card-bg-dark: #2b3035;
+    --card-header-dark: #343a40;
+    --navbar-dark: #2b3035;
+    --footer-dark: #2b3035;
+}
+
+/* Transições suaves */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Tema Light */
+[data-bs-theme="light"] {
+    background-color: var(--bg-light);
+    color: var(--text-light);
+}
+
+[data-bs-theme="light"] .navbar,
+[data-bs-theme="light"] .footer {
+    background-color: #4682b4 !important;
+}
+
+[data-bs-theme="light"] .form-select {
+    background-color: #f5f5f5 !important;
+    color: var(--text-light) !important;
+    border-color: var(--border-light) !important;
+}
+
+[data-bs-theme="light"] .card {
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+}
+
+[data-bs-theme="light"] .card-header {
+    background-color: rgba(33, 37, 41, 0.03) !important;
+    border-bottom-color: var(--bs-border-color) !important;
+}
+
+[data-bs-theme="light"] .form-control {
+    background-color: var(--input-bg-light) !important;
+    color: var(--text-light) !important;
+    border-color: var(--border-light) !important;
+}
+
+/* Tema Dark */
+[data-bs-theme="dark"] {
+    background-color: var(--bg-dark) !important;
+    color: var(--text-dark) !important;
+}
+
+[data-bs-theme="dark"] .navbar,
+[data-bs-theme="dark"] .footer {
+    background-color: var(--navbar-dark) !important;
+}
+
+[data-bs-theme="dark"] .form-select {
+    background-color: var(--input-bg-dark) !important;
+    color: var(--text-dark) !important;
+    border-color: var(--border-dark) !important;
+}
+
+[data-bs-theme="dark"] .card {
+    background-color: #212529 !important;
+    border-color: #495057 !important;
+}
+
+[data-bs-theme="dark"] .card-header {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-bottom-color: var(--bs-border-color-translucent) !important;
+}
+
+[data-bs-theme="dark"] .form-control {
+    background-color: var(--input-bg-dark) !important;
+    color: var(--text-dark) !important;
+    border-color: var(--border-dark) !important;
+}
+
+/* Navbar */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand,
+.navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.navbar-brand:hover,
+.navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+}
+
+/* Footer */
+.footer {
+    margin-top: auto;
+    padding: 1rem 0;
+}
+
+[data-bs-theme="light"] .footer {
+    color: var(--footer-text-light);
+}
+
+[data-bs-theme="light"] .footer a {
+    color: var(--footer-text-light);
+}
+
+.footer a {
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* Cards */
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-bs-theme="light"] .card {
+    background-color: var(--card-bg-light) !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+[data-bs-theme="light"] .card-header {
+    background-color: var(--card-header-light) !important;
+    border-bottom: 1px solid var(--border-light) !important;
+}
+
+[data-bs-theme="dark"] .card {
+    background-color: var(--card-bg-dark) !important;
+    border: 1px solid var(--border-dark) !important;
+}
+
+[data-bs-theme="dark"] .card-header {
+    background-color: var(--card-header-dark) !important;
+    border-bottom: 1px solid var(--border-dark) !important;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Cards específicos */
+[data-bs-theme="light"] .card.aviso-importante {
+    background-color: #ffffff !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+[data-bs-theme="dark"] .card.aviso-importante {
+    background-color: var(--card-bg-dark) !important;
+    border: 1px solid var(--border-dark) !important;
+}
+
+/* Botões */
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Links */
+[data-bs-theme="dark"] a:not(.btn):not(.nav-link):not(.navbar-brand) {
+    color: var(--primary-dark);
+}
+
+[data-bs-theme="dark"] a:not(.btn):not(.nav-link):not(.navbar-brand):hover {
+    color: var(--primary-dark-hover);
+}
+
+/* Dropdown */
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: var(--card-bg-dark);
+    border-color: var(--border-dark);
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+    color: var(--text-dark);
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover {
+    background-color: var(--primary-dark);
+    color: white;
+}
+
+[data-bs-theme="light"] .dropdown-menu {
+    background-color: #f8f9fa !important;
+    border-color: var(--border-light) !important;
+}
+
+[data-bs-theme="light"] .dropdown-item {
+    color: var(--text-light) !important;
+}
+
+[data-bs-theme="light"] .dropdown-item:hover {
+    background-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+/* Scrollbar personalizada para o tema dark */
+[data-bs-theme="dark"] ::-webkit-scrollbar {
+    width: 12px;
+}
+
+[data-bs-theme="dark"] ::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+[data-bs-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: var(--primary-dark);
+    border-radius: 6px;
+}
+
+[data-bs-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark-hover);
+}
+
+/* Títulos e textos */
+[data-bs-theme="dark"] h1, 
+[data-bs-theme="dark"] h2, 
+[data-bs-theme="dark"] h3, 
+[data-bs-theme="dark"] h4, 
+[data-bs-theme="dark"] h5, 
+[data-bs-theme="dark"] h6 {
+    color: var(--text-dark) !important;
+}
+
+[data-bs-theme="dark"] .text-muted {
+    color: #8b949e !important;
+}
+
+/* Word items */
+[data-bs-theme="dark"] .word-title {
+    color: var(--primary-dark) !important;
+}
+
+/* Botões de ação */
+[data-bs-theme="dark"] .btn-outline-primary {
+    color: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary:hover {
+    background-color: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+    color: white !important;
+}
+
+/* Modais */
+[data-bs-theme="dark"] .modal-content {
+    background-color: var(--card-bg-dark) !important;
+    border-color: var(--border-dark) !important;
+}
+
+[data-bs-theme="dark"] .modal-header,
+[data-bs-theme="dark"] .modal-footer {
+    border-color: var(--border-dark) !important;
+}
+
+/* Cards e Offcanvas */
+.word-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: center;
+    text-align: center;
+}
+
+.word-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    position: relative;
+    padding: 0 1rem;
+    text-align: center;
+}
+
+.word-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 30px;
+    width: 1px;
+    background-color: var(--border-light);
+}
+
+[data-bs-theme="dark"] .word-item:not(:last-child)::after {
+    background-color: var(--border-dark);
+}
+
+/* Estilos para o dicionário */
+.word-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.word-item .form-label {
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+/* Cards do dicionário */
+.word-info .row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.word-info .col-md-4 {
+    text-align: center;
+    min-width: 200px;
+    flex: 1;
+}
+
+.word-item {
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* Offcanvas */
+.offcanvas {
+    --bs-offcanvas-width: 400px;
+}
+
+.word-header {
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+[data-bs-theme="dark"] .word-header {
+    border-color: var(--border-dark);
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary);
+}
+
+[data-bs-theme="dark"] .accordion-button:not(.collapsed) {
+    background-color: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary);
+}
+
+/* Layout dos cards */
+.word-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: center;
+    text-align: center;
+}
+
+.word-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    position: relative;
+    padding: 0 1rem;
+    text-align: center;
+}
+
+.word-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 30px;
+    width: 1px;
+    background-color: var(--border-light);
+}
+
+[data-bs-theme="dark"] .word-item:not(:last-child)::after {
+    background-color: var(--border-dark);
+}
+
+/* Important Notice */
+.important-notice {
+    max-width: 800px;
+    margin: 2rem auto 3rem;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+}
+
+[data-bs-theme="light"] .important-notice {
+    background-color: var(--card-bg-light) !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+[data-bs-theme="dark"] .important-notice {
+    background-color: var(--card-bg-dark) !important;
+    border: 1px solid var(--border-dark) !important;
+}
+
+.important-notice h2 {
+    color: var(--primary);
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.important-notice p {
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    text-align: justify;
+}
+
+[data-bs-theme="light"] .important-notice p {
+    color: var(--text-light) !important;
+}
+
+[data-bs-theme="dark"] .important-notice p {
+    color: var(--text-dark) !important;
+}
+
+/* Estilos do Dicionário */
+.dictionary-card {
+    margin-bottom: 1rem;
+}
+
+.dictionary-card .card-body {
+    padding: 1rem;
+}
+
+.dictionary-card .aramaico,
+.dictionary-card .transliteracao,
+.dictionary-card .traducao {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.dictionary-card h3,
+.dictionary-card h4,
+.dictionary-card p {
+    text-align: center;
+    width: 100%;
+}
+
+.dictionary-card .card-body {
+    text-align: center;
+}
+
+.dictionary-card .row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dictionary-card .col {
+    text-align: justify;
+    padding: 0.5rem;
+}
+
+.word-card {
+    text-align: justify;
+}
+
+.word-card .row {
+    justify-content: center;
+}
+
+.word-card .col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#wordDetailsContent .row {
+    justify-content: center;
+    text-align: center;
+}
+
+#wordDetailsContent dl.row {
+    margin: 0 auto;
+    max-width: 90%;
+}
+
+#wordDetailsContent .accordion-body {
+    text-align: justify;
+}
+
+/* Responsividade do Dicionário */
+@media (max-width: 768px) {
+    #searchForm {
+        flex-direction: column;
+        gap: 1rem !important;
+    }
+    
+    #searchForm .form-select,
+    #searchForm .form-control,
+    #searchForm .btn {
+        width: 100% !important;
+    }
+    
+    .offcanvas {
+        width: 100% !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .offcanvas {
+        width: 400px;
+    }
+}
+
+/* Estilos para usuários não autenticados */
+body.user-not-authenticated {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Estilos para o modal que respeitam o tema */
+.modal-content {
+    border: none;
+}
+
+[data-bs-theme="dark"] .modal-content {
+    background-color: var(--bs-dark);
+    color: var(--bs-light);
+}
+
+[data-bs-theme="dark"] .modal-header {
+    border-bottom-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .modal-footer {
+    border-top-color: var(--bs-border-color);
+}
+
+/* Nota do Tradutor */
+[data-bs-theme="dark"] .translator-note-header,
+[data-bs-theme="dark"] .fonte-text,
+[data-bs-theme="dark"] .traducao-text,
+[data-bs-theme="dark"] .verse-metadata small,
+[data-bs-theme="dark"] .card-subtitle,
+[data-bs-theme="dark"] .aramaic-text-header,
+[data-bs-theme="dark"] .portuguese-text-header {
+    color: #82b1ff !important;
+}
+
+[data-bs-theme="dark"] .card-subtitle {
+    font-size: 1.1em;
+    font-weight: bold;
+    background-color: #343a40;
+    padding: 10px;
+    border-radius: 4px;
+    margin: -12px -12px 15px -12px;
+    border-bottom: 2px solid #495057;
+}
+
+[data-bs-theme="dark"] .verse-metadata {
+    color: #82b1ff !important;
+}
+
+[data-bs-theme="dark"] .verse-metadata small {
+    opacity: 0.9;
+}
+
+[data-bs-theme="light"] .translator-note .card-subtitle {
+    color: #0047ab !important;
+    font-size: 1.1em;
+    font-weight: bold;
+    background-color: #e8f4ff;
+    padding: 10px;
+    border-radius: 4px;
+    margin: -12px -12px 15px -12px;
+    border-bottom: 2px solid #0047ab;
+}
+
+.translator-note {
+    border-left: 4px solid var(--primary) !important;
+}
+
+/* Estilos para textos no tema escuro */
+[data-bs-theme="dark"] .text-header {
+    color: #82b1ff !important;
+}

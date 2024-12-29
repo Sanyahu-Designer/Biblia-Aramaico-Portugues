@@ -1,0 +1,54 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{{ book.name }} - Capítulos</h1>
+    
+    {% if messages %}
+    <ul class="messagelist">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    
+    <div class="module">
+        {% if has_add_permission %}
+        <div style="margin-bottom: 20px;">
+            <a href="{% url 'admin:add_chapter' book.id %}" class="addlink">
+                Adicionar Capítulo
+            </a>
+        </div>
+        {% endif %}
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Número do Capítulo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for chapter in chapters %}
+                <tr>
+                    <td>{{ chapter.number }}</td>
+                    <td>
+                        <a href="{% url 'admin:chapter_verses' chapter.id %}">
+                            Ver Versículos
+                        </a>
+                        |
+                        <a href="{% url 'admin:bible_app_chapter_change' chapter.id %}">
+                            Editar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2">Nenhum capítulo encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

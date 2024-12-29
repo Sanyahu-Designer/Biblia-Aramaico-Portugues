@@ -1,0 +1,48 @@
+.hebrew-font {
+    font-family: 'Estrangelo Edessa', 'Times New Roman', serif;
+    font-size: 1.4em;
+    direction: rtl;
+    text-align: right;
+}
+.dictionary-card {
+    background-color: #f8f9fa;
+    color: #495057;
+}
+body[data-theme="dark"] .dictionary-card {
+    background-color: #2b3035;
+    color: #e0e0e0;
+}
+body[data-theme="dark"] .dictionary-card .card-body {
+    background-color: #2b3035;
+    color: #e0e0e0;
+}
+.dictionary-row .dictionary-col {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.dictionary-title {
+    font-size: 0.8rem;
+}
+.dictionary-text {
+    font-size: 1rem;
+}
+body[data-theme="dark"] .text-muted {
+    color: #999 !important;
+}
+body[data-theme="dark"] input::placeholder {
+    color: #ccc !important;
+}
+input::placeholder {
+    color: #6c757d;
+}
+
+body[data-theme="dark"] .form-control {
+    background-color: #333;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+body[data-theme="dark"] .form-control:focus {
+    border-color: #66afe9;
+    box-shadow: 0 0 0 0.2rem rgba(102, 175, 233, 0.25);
+}

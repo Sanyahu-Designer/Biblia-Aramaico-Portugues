@@ -1,0 +1,55 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Diretórios de ambiente virtual
+env/
+venv/
+ENV/
+ENV*/
+venv*/
+.virtualenv/
+
+# Arquivos de configuração e dependências locais
+*.env
+*.local
+.env.*
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos gerados pelo editor ou IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Arquivos de log e cache
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+
+# Diretórios específicos do Django
+*.sqlite3
+db.sqlite3
+db_*.sqlite3
+/media/
+*.pot
+*.mo
+
+# Staticfiles e arquivos compilados
+/staticfiles/
+*/static/
+node_modules/
+npm-debug.log*
+
+# Arquivos de migrações que não devem ser versionados (se aplicável)
+*/migrations/*.pyc
+*/migrations/__pycache__/
+
+# Arquivos específicos do Jazzmin (personalizações locais ou dependências)
+jazzmin/

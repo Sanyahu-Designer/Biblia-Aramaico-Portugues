@@ -1,0 +1,81 @@
+{% load static %}
+
+<div class="verse-card" id="verse-{{ verse.id }}">
+    <div class="verse-header">
+        <div class="flex justify-between items-center">
+            <h3 class="verse-reference">{{ verse.chapter.book.name }} {{ verse.chapter.number }}:{{ verse.number }}</h3>
+            <div class="verse-actions">
+                <button class="btn btn-ghost btn-sm" onclick="toggleBookmark({{ verse.id }})">
+                    <i class="bi {% if verse.is_bookmarked %}bi-bookmark-fill{% else %}bi-bookmark{% endif %}"></i>
+                </button>
+                <button class="btn btn-ghost btn-sm" onclick="toggleNotes({{ verse.id }})">
+                    <i class="bi bi-journal-text"></i>
+                </button>
+                <button class="btn btn-ghost btn-sm copy-verse">
+                    <i class="bi bi-clipboard"></i>
+                </button>
+                <button class="btn btn-ghost btn-sm" onclick="shareVerse({{ verse.id }})">
+                    <i class="bi bi-share"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="verse-content">
+        <div class="aramaic-section">
+            <div class="flex justify-between items-center mb-2">
+                <h4 class="text-sm font-semibold text-gray-600">Texto em Aramaico:</h4>
+                <button class="btn btn-ghost btn-xs" onclick="playPronunciation({{ verse.id }})">
+                    <i class="bi bi-volume-up"></i>
+                </button>
+            </div>
+            <p class="aramaic-text" lang="arc" dir="rtl">{{ verse.aramaic_text }}</p>
+            <div class="word-analysis mt-2 text-sm">
+                {% for word in verse.aramaic_words %}
+                <span class="word-item cursor-pointer hover:text-primary" 
+                      onclick="showWordDetails('{{ word.id }}')">
+                    {{ word.text }}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="portuguese-section mt-4">
+            <h4 class="text-sm font-semibold text-gray-600">Tradução em Português:</h4>
+            <p class="portuguese-text">{{ verse.portuguese_text }}</p>
+        </div>
+
+        {% if verse.translator_note %}
+        <div class="translator-note mt-4 bg-gray-50 p-3 rounded">
+            <h4 class="text-sm font-semibold text-gray-600">Nota do Tradutor:</h4>
+            <p class="text-sm">{{ verse.translator_note }}</p>
+        </div>
+        {% endif %}
+
+        <div class="verse-metadata mt-4 text-sm text-gray-600">
+            <div class="flex justify-between items-center">
+                <span>Fonte: {{ verse.get_aramaic_source_display }}</span>
+                <span>Tradutor: {{ verse.get_translator_display }}</span>
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+        <div id="notes-section-{{ verse.id }}" class="notes-section mt-4 hidden">
+            <textarea class="w-full p-2 border rounded" 
+                      placeholder="Adicione suas anotações aqui..."
+                      onchange="saveNotes({{ verse.id }}, this.value)">{{ verse.user_notes }}</textarea>
+        </div>
+        {% endif %}
+
+        <div class="verse-tags mt-4">
+            {% for tag in verse.tags.all %}
+            <span class="tag">{{ tag.name }}</span>
+            {% endfor %}
+            {% if user.is_authenticated %}
+            <button class="btn btn-ghost btn-xs" onclick="showTagModal({{ verse.id }})">
+                <i class="bi bi-plus"></i> Adicionar Tag
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</div>

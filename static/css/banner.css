@@ -1,0 +1,53 @@
+.floating-banner {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    width: 270px !important;
+    background: white !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+    z-index: 999999 !important;
+    overflow: hidden !important;
+}
+
+.banner-content {
+    width: 100% !important;
+    position: relative !important;
+    background: white !important;
+}
+
+.banner-inner {
+    display: block !important;
+    width: 100% !important;
+    text-decoration: none !important;
+    background: white !important;
+}
+
+.banner-inner img {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 480px !important;
+    display: block !important;
+    border-radius: 12px !important;
+    object-fit: contain !important;
+    background: white !important;
+}
+
+.close-button {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    width: 30px !important;
+    height: 30px !important;
+    background: rgba(0,0,0,0.7) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    font-size: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 999999 !important;
+    padding: 0 !important;
+}

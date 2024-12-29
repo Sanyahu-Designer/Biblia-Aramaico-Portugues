@@ -1,0 +1,55 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_header|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <img src="{% static 'img/logo.png' %}" alt="Evangelhos Aramaico Siríaco" height="40" style="margin-right: 10px;">
+        Administração
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block footer %}
+<footer class="main-footer">
+    <div class="float-right d-none d-sm-inline">
+        EAS 3.0.0
+    </div>
+    <strong>Todos os Direitos Reservados @ {% now "Y" %} Evangelhos Aramaico Siriaco</strong>
+</footer>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<!-- Favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
+<link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/icone-180x180.png' %}">
+<link rel="icon" type="image/png" sizes="192x192" href="{% static 'img/icone-192x192.png' %}">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Remove o módulo de ações recentes
+        var recentActionsModule = document.getElementById('recent-actions-module');
+        if (recentActionsModule) {
+            recentActionsModule.remove();
+        }
+        
+        // Remove também a coluna que contém as ações recentes
+        var sidePanel = document.querySelector('.dashboard .col-lg-3');
+        if (sidePanel) {
+            sidePanel.remove();
+        }
+        
+        // Ajusta a largura da coluna principal
+        var mainContent = document.querySelector('.dashboard .col-lg-9');
+        if (mainContent) {
+            mainContent.className = mainContent.className.replace('col-lg-9', 'col-lg-12');
+        }
+    });
+</script>
+{% endblock %}

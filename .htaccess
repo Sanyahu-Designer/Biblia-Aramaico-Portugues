@@ -1,0 +1,106 @@
+AddDefaultCharset UTF-8
+AddCharset UTF-8 .html .css .js .xml .json .txt
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    
+    # Configuração correta de Content-Type para arquivos estáticos
+    <FilesMatch "\.(css)$">
+        Header set Content-Type "text/css"
+    </FilesMatch>
+    <FilesMatch "\.(js)$">
+        Header set Content-Type "application/javascript"
+    </FilesMatch>
+    <FilesMatch "\.(html)$">
+        Header set Content-Type "text/html; charset=UTF-8"
+    </FilesMatch>
+    
+    # Permitir CORS para requisições AJAX
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, X-Requested-With"
+</IfModule>
+
+# Serve favicon.ico from static directory
+Alias /favicon.ico /home/netsarim/staging/staticfiles/favicon.ico
+
+# Serve static files
+<Directory /home/project/staticfiles>
+    Require all granted
+    Options -Indexes
+    
+    # Configuração de tipos MIME
+    AddType text/css .css
+    AddType application/javascript .js
+    AddType application/font-woff2 .woff2
+    AddType application/font-woff .woff
+    AddType application/x-font-ttf .ttf
+    AddType application/x-font-opentype .otf
+    AddType image/svg+xml .svg
+    
+    <FilesMatch "\.(css|js|jpg|jpeg|png|gif|ico|woff|woff2|ttf|eot|svg)$">
+        Header set Cache-Control "max-age=31536000, public"
+    </FilesMatch>
+</Directory>
+
+# Serve media files
+<Directory /home/netsarim/staging/media>
+    Require all granted
+    Options -Indexes
+    
+    <IfModule mod_rewrite.c>
+        RewriteEngine On
+        RewriteCond %{REQUEST_URI} ^/media/
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^media/(.*)$ /banners/media/$1 [L]
+    </IfModule>
+
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp)$">
+        Header set Cache-Control "max-age=31536000, public"
+    </FilesMatch>
+</Directory>
+
+Alias /media/ /home/netsarim/staging/media/
+
+# GZIP Compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# Browser caching
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType application/x-javascript "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+</IfModule>
+
+# Rewrite rules for static files
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} ^/static/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^static/(.*)$ /staticfiles/$1 [L]
+</IfModule>
+
+# Force HTTPS
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>

@@ -1,0 +1,38 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'css/tooltip.css' %}">
+<style>
+    .field-preview {
+        margin: 1rem 0;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+    
+    .preview-label {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .preview-content {
+        font-size: 1.1em;
+    }
+    
+    [data-theme="dark"] .field-preview {
+        background: #2b3035;
+    }
+</style>
+{% endblock %}
+
+{% block after_field_sets %}
+{{ block.super }}
+<div class="field-preview">
+    <div class="preview-label">Visualização do Tooltip:</div>
+    <div class="preview-content">
+        {{ original.termo_original|default:"" }}
+    </div>
+</div>
+{% endblock %}

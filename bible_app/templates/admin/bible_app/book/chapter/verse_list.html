@@ -1,0 +1,68 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'admin/css/changelists.css' %}">
+    <style>
+        .hebrew-font {
+            font-family: 'SBL Hebrew', 'Times New Roman', serif;
+            font-size: 1.2em;
+            direction: rtl;
+            text-align: right;
+        }
+        .verse-text {
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="module filtered">
+        <div class="changelist-form-container">
+            <div class="results">
+                <div class="admin-tools">
+                    <h1>{{ chapter.book.name }} - Capítulo {{ chapter.number }} - Versículos</h1>
+                    {% if has_add_permission %}
+                    <div class="object-tools">
+                        <a href="{% url 'admin:bible_app_verse_add' %}?chapter={{ chapter.id }}" class="addlink">
+                            Adicionar Versículo
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <table id="result_list">
+                    <thead>
+                        <tr>
+                            <th>Versículo</th>
+                            <th>Texto Aramaico</th>
+                            <th>Texto Português</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for verse in verses %}
+                        <tr class="{% cycle 'row1' 'row2' %}">
+                            <td>{{ verse.number }}</td>
+                            <td class="hebrew-font verse-text">{{ verse.aramaic_text }}</td>
+                            <td class="verse-text">{{ verse.portuguese_text }}</td>
+                            <td>
+                                <a href="{% url 'admin:bible_app_verse_change' verse.id %}"
+                                   class="button">Editar</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4">Nenhum versículo encontrado.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

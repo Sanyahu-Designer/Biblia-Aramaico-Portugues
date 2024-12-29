@@ -1,0 +1,223 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    @font-face {
+        font-family: 'Estrangelo Edessa';
+        src: url('/static/fonts/estrangelo-edessa.woff2') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    .verse-form-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 20px;
+    }
+
+    .selection-panel {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 4px;
+        position: sticky;
+        top: 20px;
+    }
+
+    .form-panel {
+        background: white;
+        padding: 20px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #666;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #447e9b;
+        box-shadow: 0 0 0 2px rgba(68,126,155,0.1);
+    }
+
+    .aramaic-text {
+        direction: rtl;
+        font-family: 'Estrangelo Edessa', serif;
+        font-size: 18px;
+        line-height: 1.5;
+    }
+
+    .btn-toolbar {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+        background: #447e9b;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #366b84;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+
+    #message-container {
+        margin-bottom: 20px;
+    }
+
+    .error-message {
+        padding: 12px;
+        background: #fee;
+        border: 1px solid #fcc;
+        border-radius: 4px;
+        color: #c00;
+    }
+
+    .success-message {
+        padding: 12px;
+        background: #efe;
+        border: 1px solid #cfc;
+        border-radius: 4px;
+        color: #0c0;
+    }
+
+    .keyboard-shortcuts {
+        margin-top: 20px;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+
+    .keyboard-shortcuts kbd {
+        background: #eee;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        padding: 2px 4px;
+        font-size: 11px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="verse-form-container">
+    <div id="message-container"></div>
+    
+    <div class="form-grid">
+        <div class="selection-panel">
+            <h2>Seleção do Texto</h2>
+            <div class="form-group">
+                <label for="book-select">Livro</label>
+                <select id="book-select" class="form-control">
+                    <option value="">Selecione um Livro</option>
+                    {% for book in books %}
+                    <option value="{{ book.id }}">{{ book.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="chapter-select">Capítulo</label>
+                <select id="chapter-select" class="form-control" disabled>
+                    <option value="">Selecione um Capítulo</option>
+                </select>
+            </div>
+            
+            <div class="keyboard-shortcuts">
+                <strong>Atalhos:</strong>
+                <br>
+                <kbd>Ctrl</kbd> + <kbd>S</kbd> - Salvar e continuar
+            </div>
+        </div>
+
+        <div class="form-panel">
+            <form id="verse-form" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="verse-number">Número do Versículo</label>
+                    <input type="number" id="verse-number" name="number" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="aramaic-text">Texto em Aramaico</label>
+                    <textarea id="aramaic-text" name="aramaic_text" class="form-control aramaic-text" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="portuguese-text">Texto em Português</label>
+                    <textarea id="portuguese-text" name="portuguese_text" class="form-control" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="aramaic-source">Fonte do Texto Aramaico</label>
+                    <select id="aramaic-source" name="aramaic_source" class="form-control" required>
+                        <option value="">Selecione a Fonte</option>
+                        <option value="curetonian">Antigos Evangelhos Curetonianos Siríacos</option>
+                        <option value="sinaiticus">Palimpsesto Sinaítico Siríaco Antigo</option>
+                        <option value="peshitta">Peshitta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="translator">Tradutor</label>
+                    <select id="translator" name="translator" class="form-control" required>
+                        <option value="">Selecione o Tradutor</option>
+                        <option value="yosef_chaim">Yosef Chaim</option>
+                        <option value="netzer_netzarim">Netzer Netzarim</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="translator-note">Nota do Tradutor (opcional)</label>
+                    <textarea id="translator-note" name="translator_note" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="btn-toolbar">
+                    <button type="submit" class="btn btn-primary">Salvar e Continuar</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='../'" >Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script src="{% static 'admin/js/verse_form.js' %}"></script>

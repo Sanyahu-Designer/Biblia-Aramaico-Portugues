@@ -1,0 +1,51 @@
+/* Estilos para o tooltip */
+.tooltip-word {
+    position: relative;
+    cursor: help;
+    border-bottom: 1px dashed #999;
+    display: inline-block;
+    font-weight: bold;
+}
+
+.tooltip-word::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px;
+    background-color: #333;
+    color: white;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    z-index: 1000;
+    font-weight: normal;
+}
+
+.tooltip-word:hover::after {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Seta do tooltip */
+.tooltip-word::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #333;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.tooltip-word:hover::before {
+    visibility: visible;
+    opacity: 1;
+}

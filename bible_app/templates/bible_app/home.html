@@ -1,0 +1,459 @@
+{% extends 'base.html' %}
+{% load static %}
+{% csrf_token %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'bible_app/css/verse_styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/tooltip.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+    /* Estilos do tema claro */
+    [data-bs-theme="light"] {
+        --bs-body-bg: #ffffff;
+        --bs-body-color: #212529;
+    }
+
+    [data-bs-theme="light"] .card {
+        --bs-card-bg: #f8f9fa;
+        --bs-card-border-color: #dee2e6;
+    }
+
+    /* Estilos do tema escuro */
+    [data-bs-theme="dark"] {
+        --bs-body-bg: #212529;
+        --bs-body-color: #ffffff;
+    }
+
+    [data-bs-theme="dark"] .card,
+    [data-bs-theme="dark"] .verse-card {
+        background-color: #2b3035 !important;
+        border-color: #495057 !important;
+    }
+
+    [data-bs-theme="dark"] .card-header,
+    [data-bs-theme="dark"] .verse-header {
+        background-color: #343a40 !important;
+        border-bottom-color: #495057 !important;
+        color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .verse-content {
+        background-color: #2b3035 !important;
+        color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .verse-content p,
+    [data-bs-theme="dark"] .verse-content div {
+        color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .text-muted,
+    [data-bs-theme="dark"] .h6.text-muted {
+        color: #adb5bd !important;
+    }
+
+    [data-bs-theme="dark"] .translator-note {
+        background-color: #343a40 !important;
+        border-left-color: #495057 !important;
+        color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .translator-note p {
+        color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .verse-metadata small {
+        color: #adb5bd !important;
+    }
+
+    [data-bs-theme="dark"] .btn-outline-secondary {
+        color: #adb5bd !important;
+        border-color: #495057 !important;
+    }
+
+    [data-bs-theme="dark"] .btn-outline-secondary:hover {
+        background-color: #495057 !important;
+        color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .verse-reference {
+        color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .aramaic-text {
+        color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .portuguese-text {
+        color: #ffffff !important;
+    }
+
+    /* Estilos comuns */
+    .verse-metadata {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+
+    .translator-note {
+        padding: 0.75rem;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        border-left: 4px solid var(--bs-primary) !important;
+    }
+
+    [data-bs-theme="light"] .translator-note {
+        background-color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .translator-note {
+        background-color: #2b3035 !important;
+    }
+
+    .translator-note .card-subtitle {
+        background-color: #e3f2fd;
+        color: #0d6efd;
+        padding: 10px;
+        border-radius: 4px;
+        margin: -12px -12px 15px -12px;
+        border-bottom: 2px solid #0d6efd;
+    }
+
+    [data-bs-theme="light"] .translator-note .card-subtitle {
+        color: #0d6efd !important;
+        font-size: 1.1em;
+    }
+
+    [data-bs-theme="dark"] .translator-note .card-subtitle {
+        color: #00ff00 !important;
+        font-size: 1.1em;
+    }
+
+    .translator-note-title {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        margin: -16px -16px 12px -16px;
+        border-bottom: 1px solid;
+    }
+
+    [data-bs-theme="light"] .translator-note-title {
+        background-color: #e3f2fd;
+        color: #0d6efd;
+        border-bottom-color: #0d6efd;
+    }
+
+    [data-bs-theme="dark"] .translator-note-title {
+        background-color: #1a237e;
+        color: #82b1ff;
+        border-bottom-color: #82b1ff;
+    }
+
+    .translator-note-title i {
+        margin-right: 8px;
+        font-size: 1.1em;
+    }
+
+    .translator-note-content {
+        padding: 0 12px;
+    }
+
+    .translator-note .card-body {
+        padding: 20px;
+    }
+
+    .portuguese-text p {
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .important-notice {
+        max-width: 800px;
+        margin: 2rem auto 3rem;
+        padding: 2rem;
+        background-color: var(--bs-secondary-bg);
+        border: 1px solid var(--bs-border-color);
+        border-radius: 8px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    }
+
+    .important-notice h2 {
+        color: var(--bs-primary);
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .important-notice p {
+        color: var(--bs-body-color);
+        line-height: 1.8;
+        margin-bottom: 1rem;
+        text-align: justify;
+    }
+
+    .important-notice p:last-child {
+        margin-bottom: 0;
+    }
+
+    [data-bs-theme="light"] .important-notice {
+        background-color: var(--bs-secondary-bg) !important;
+        border: 1px solid var(--bs-border-color) !important;
+    }
+
+    [data-bs-theme="light"] .important-notice h2 {
+        color: var(--bs-primary) !important;
+    }
+
+    [data-bs-theme="light"] .important-notice p {
+        color: var(--bs-body-color) !important;
+    }
+
+    [data-bs-theme="dark"] .important-notice {
+        background-color: var(--bs-secondary-bg) !important;
+        border: 1px solid var(--bs-border-color) !important;
+    }
+
+    [data-bs-theme="dark"] .important-notice h2 {
+        color: var(--bs-primary) !important;
+    }
+
+    [data-bs-theme="dark"] .important-notice p {
+        color: var(--bs-body-color) !important;
+    }
+
+    [data-bs-theme="dark"] .form-select {
+        background-color: var(--bs-secondary-bg) !important;
+        border-color: var(--bs-border-color) !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    [data-bs-theme="dark"] .card-header {
+        background-color: var(--bs-secondary-bg) !important;
+        border-bottom-color: var(--bs-border-color) !important;
+    }
+
+    [data-bs-theme="light"] .form-select {
+        background-color: var(--bs-secondary-bg) !important;
+        border-color: var(--bs-border-color) !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    [data-bs-theme="light"] .card-header {
+        background-color: var(--bs-secondary-bg) !important;
+        border-bottom-color: var(--bs-border-color) !important;
+    }
+
+    [data-bs-theme="light"] h4 {
+        color: var(--bs-primary) !important;
+    }
+
+    [data-bs-theme="dark"] .translator-note {
+        background-color: var(--bs-dark);
+        border-left-color: var(--bs-gray-600);
+    }
+
+    [data-bs-theme="dark"] .translator-note p {
+        color: var(--bs-body-color);
+    }
+
+    [data-bs-theme="dark"] .verse-metadata small {
+        color: var(--bs-gray-400);
+    }
+
+    [data-bs-theme="dark"] .verse-card {
+        background-color: var(--bs-dark);
+        border-color: var(--bs-border-color);
+    }
+
+    [data-bs-theme="dark"] .verse-header {
+        background-color: var(--bs-dark);
+        border-bottom-color: var(--bs-border-color);
+    }
+
+    [data-bs-theme="dark"] .verse-content {
+        color: var(--bs-body-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main role="main">
+    <section class="container mt-4">
+        <form class="row mb-4" role="search">
+            <div class="col-md-6">
+                <label for="book-select" class="visually-hidden">Selecione um Livro</label>
+                <select id="book-select" class="form-select" aria-label="Selecione um Livro">
+                    <option value="">Selecione um Livro</option>
+                    {% for book in books %}
+                    <option value="{{ book.id }}" {% if book.id|stringformat:"s" == selected_book_id %}selected{% endif %}>
+                        {{ book.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="chapter-select" class="visually-hidden">Selecione um Capítulo</label>
+                <select id="chapter-select" class="form-select" aria-label="Selecione um Capítulo" {% if not selected_book_id %}disabled{% endif %}>
+                    <option value="">Selecione um Capítulo</option>
+                </select>
+            </div>
+        </form>
+
+        {% if verses %}
+        <section class="verses-container" aria-label="Versículos">
+            {% for verse in verses %}
+            <article class="card verse-card mb-4">
+                <header class="verse-header d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0 verse-reference">{{ verse.chapter.book.name }} {{ verse.chapter.number }}:{{ verse.number }}</h2>
+                    <div class="verse-actions">
+                        <button type="button" class="btn btn-outline-secondary btn-sm copy-verse" title="Copiar versículo" aria-label="Copiar versículo">
+                            <i class="bi bi-clipboard" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm print-verse ms-2" title="Imprimir versículo" aria-label="Imprimir versículo">
+                            <i class="bi bi-printer" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </header>
+                <div class="verse-content">
+                    <div class="text-section">
+                        <p class="aramaic-text-header">Texto em Aramaico:</p>
+                        <p class="aramaic-text" lang="arc" dir="rtl">{{ verse.aramaic_text }}</p>
+                    </div>
+                    <div class="text-section portuguese-text">
+                        <p class="portuguese-text-header">Tradução em Português:</p>
+                        <div lang="pt-BR">{{ verse.portuguese_text|safe }}</div>
+                    </div>
+                    {% if verse.translator_note %}
+                    <div class="card mt-3 translator-note">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-3 text-primary fw-bold">
+                                <i class="bi bi-pencil-square me-2"></i>
+                                Nota do Tradutor
+                            </h6>
+                            <div class="card-text">{{ verse.translator_note }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="verse-metadata">
+                        <small class="fonte-text">Fonte: {{ verse.get_aramaic_source_display }}</small>
+                        <small class="traducao-text">Tradução: {{ verse.get_translator_display }}</small>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </section>
+
+        <nav class="navigation-buttons mt-4" aria-label="Navegação entre capítulos">
+            <div class="d-flex justify-content-between align-items-center">
+                {% if previous_chapter %}
+                <a href="/?book={{ previous_chapter.book.id }}&chapter={{ previous_chapter.id }}" 
+                   class="btn btn-outline-primary"
+                   rel="prev">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                    <span>Capítulo {{ previous_chapter.number }}</span>
+                </a>
+                {% else %}
+                <div></div>
+                {% endif %}
+
+                {% if next_chapter %}
+                <a href="/?book={{ next_chapter.book.id }}&chapter={{ next_chapter.id }}" 
+                   class="btn btn-outline-primary"
+                   rel="next">
+                    <span>Capítulo {{ next_chapter.number }}</span>
+                    <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </a>
+                {% else %}
+                <div></div>
+                {% endif %}
+            </div>
+        </nav>
+        {% else %}
+        <div class="text-center mt-5">
+            <h2 class="h3">Selecione um livro e capítulo para visualizar os versículos</h2>
+            
+            <div class="important-notice">
+                <div class="card-header">
+                    <h4 class="text-center mb-0">Aviso Importante</h4>
+                </div>
+                <div class="card-body">
+                    <p>Estamos dedicando nossos esforços diariamente para oferecer traduções diretas do aramaico para o português. Esse é um processo cuidadoso e minucioso, que busca garantir a precisão e fidelidade dos textos. As traduções são realizadas a partir dos manuscritos antigos, como os Evangelhos Curetonianos Siríacos, o Palimpsesto Sinaítico Siríaco Antigo e a Peshitta.</p>
+                    
+                    <p>A princípio, serão traduzidos apenas os manuscritos dos livros de Mateus, Marcos, Lucas e João. Vale ressaltar que a tradução de um único versículo pode levar dias para ser concluída corretamente, devido ao cuidado necessário com cada palavra e significado.</p>
+                    
+                    <p>Agradecemos a sua compreensão e paciência enquanto trabalhamos para entregar um conteúdo de qualidade e com o máximo de autenticidade.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const selectedChapterId = '{{ selected_chapter_id }}';
+</script>
+<script src="{% static 'js/bible_navigation.js' %}"></script>
+<script src="{% static 'bible_app/js/verse_interactions.js' %}"></script>
+<script src="{% static 'js/tooltip.js' %}"></script>
+
+<script>
+    function updateTranslatorNoteTheme() {
+        const isDarkTheme = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+        const translatorNotes = document.querySelectorAll('.translator-note');
+        
+        translatorNotes.forEach(note => {
+            if (isDarkTheme) {
+                note.style.backgroundColor = '#2b3035';
+                note.style.color = '#ffffff';
+                note.style.borderLeftColor = '#495057';
+                
+                const header = note.querySelector('.translator-note-title');
+                if (header) {
+                    header.style.color = '#ffffff';
+                }
+                
+                const paragraph = note.querySelector('.translator-note-content');
+                if (paragraph) {
+                    paragraph.style.color = '#ffffff';
+                }
+            } else {
+                note.style.backgroundColor = '#f8f9fa';
+                note.style.color = '#495057';
+                note.style.borderLeftColor = '#6c757d';
+                
+                const header = note.querySelector('.translator-note-title');
+                if (header) {
+                    header.style.color = '#495057';
+                }
+                
+                const paragraph = note.querySelector('.translator-note-content');
+                if (paragraph) {
+                    paragraph.style.color = '#495057';
+                }
+            }
+        });
+    }
+
+    // Observar mudanças no atributo data-bs-theme
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-bs-theme') {
+                updateTranslatorNoteTheme();
+            }
+        });
+    });
+
+    // Iniciar observação
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-bs-theme']
+    });
+
+    // Aplicar tema inicial
+    document.addEventListener('DOMContentLoaded', updateTranslatorNoteTheme);
+</script>
+{% endblock %}

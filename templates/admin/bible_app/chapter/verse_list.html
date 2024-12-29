@@ -1,0 +1,46 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{{ chapter.book.name }} - Capítulo {{ chapter.number }} - Versículos</h1>
+    
+    <div class="module">
+        {% if has_add_permission %}
+        <div style="margin-bottom: 20px;">
+            <a href="{% url 'admin:bible_app_verse_add' %}?chapter={{ chapter.id }}" class="addlink">
+                Adicionar Versículo
+            </a>
+        </div>
+        {% endif %}
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Versículo</th>
+                    <th>Texto Aramaico</th>
+                    <th>Texto Português</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for verse in verses %}
+                <tr>
+                    <td>{{ verse.number }}</td>
+                    <td dir="rtl">{{ verse.aramaic_text|truncatechars:50 }}</td>
+                    <td>{{ verse.portuguese_text|truncatechars:50 }}</td>
+                    <td>
+                        <a href="{% url 'admin:bible_app_verse_change' verse.id %}">
+                            Editar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Nenhum versículo encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

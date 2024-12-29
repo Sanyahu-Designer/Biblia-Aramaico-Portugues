@@ -1,0 +1,419 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dicionário{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Tema escuro para o accordion */
+    .accordion-dark .accordion-item {
+        background-color: #212529 !important;
+        border-color: rgba(255, 255, 255, 0.125) !important;
+    }
+
+    .accordion-dark .accordion-button {
+        background-color: #212529 !important;
+        color: #fff !important;
+    }
+
+    .accordion-dark .accordion-button:not(.collapsed) {
+        background-color: #2c3034 !important;
+        color: #fff !important;
+    }
+
+    .accordion-dark .accordion-button::after {
+        filter: invert(1);
+    }
+
+    .accordion-dark .accordion-collapse {
+        background-color: #212529 !important;
+        color: #fff !important;
+    }
+
+    /* Ajustes para o offcanvas */
+    .offcanvas-dark {
+        background-color: #212529 !important;
+        color: #fff !important;
+    }
+
+    /* Ajuste para palavra em aramaico no offcanvas */
+    #wordDetailsContent .aramaic-text {
+        text-align: center !important;
+        display: block;
+        direction: rtl;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Ajuste para textos dentro do accordion */
+    .accordion-dark .text-muted {
+        color: #adb5bd !important;
+    }
+
+    /* Remove a borda branca do botão quando focado */
+    .accordion-button:focus {
+        box-shadow: none !important;
+        border-color: rgba(255, 255, 255, 0.125) !important;
+    }
+
+    /* Ajusta o hover do botão */
+    .accordion-button:hover {
+        background-color: #2c3034 !important;
+    }
+
+    /* Ajustes para o título e conteúdo do offcanvas */
+    .offcanvas-header {
+        position: relative;
+        padding: 1rem;
+    }
+
+    .offcanvas-title {
+        color: white !important;
+        width: 100% !important;
+        text-align: center !important;
+        font-size: 1.25rem !important;
+        margin: 0 !important;
+    }
+
+    .btn-close-white {
+        position: absolute !important;
+        right: 1rem !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+    }
+
+    /* Ajustes para o texto em aramaico */
+    .word-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .aramaic-text {
+        font-size: 1.3rem;
+        direction: rtl;
+        margin-bottom: 0.5rem !important;
+        display: block;
+    }
+
+    .transliteracao {
+        margin-bottom: 0.25rem !important;
+    }
+
+    /* Estilo específico para o select de categorias */
+    select[name="category"] {
+        min-width: 150px;
+        max-width: 250px;
+        width: auto !important;
+    }
+
+    @media screen and (max-width: 768px) {
+        #searchForm {
+            flex-direction: column !important;
+        }
+        
+        select[name="category"] {
+            width: 100% !important;
+            max-width: none !important;
+            min-width: auto !important;
+        }
+    }
+
+    /* Estilos específicos para o select */
+    .form-select {
+        flex: 0 0 auto;
+        width: 200px;
+        background-color: #212529;
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.125);
+    }
+
+    @media (max-width: 768px) {
+        .form-select {
+            width: 100%;
+        }
+    }
+
+    /* Ajustes responsivos para o formulário de busca */
+    @media (max-width: 768px) {
+        #searchForm {
+            flex-direction: column !important;
+        }
+        
+        #searchForm .form-select,
+        #searchForm .form-control,
+        #searchForm .btn {
+            width: 100% !important;
+            margin-bottom: 0.5rem !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h4>Dicionário Aramaico/Português</h4>
+        </div>
+    </div>
+    <div class="container">
+        <!-- Barra de pesquisa -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <form id="searchForm" class="d-flex gap-2">
+                    <input type="search" 
+                           name="q" 
+                           class="form-control" 
+                           placeholder="Buscar palavras..."
+                           value="{{ request.GET.q|default:'' }}">
+                    <select name="category" class="form-select" style="width: auto;">
+                        <option value="">Todas as categorias</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lista de palavras -->
+        <div id="wordsList"></div>
+    </div>
+
+    <!-- Offcanvas -->
+    <div class="offcanvas offcanvas-end bg-dark text-light" tabindex="-1" id="wordDetailsOffcanvas">
+        <div class="offcanvas-header border-bottom border-secondary">
+            <h5 class="offcanvas-title text-light mx-auto">Morfologia</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" style="position: absolute; right: 1rem;"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div id="wordDetailsContent">
+                <!-- Cabeçalho -->
+                <div class="text-center">
+                    <h3 class="aramaic-text mb-2"></h3>
+                    <small class="text-light d-block mb-1">Transliteração</small>
+                    <p class="transliteracao mb-2"></p>
+                    <small class="text-light d-block mb-1">Tradução</small>
+                    <h4 class="traducao mb-2"></h4>
+                </div>
+
+                <!-- Accordion -->
+                <div class="accordion accordion-dark" id="wordDetailsAccordion">
+                    <!-- Informações Básicas -->
+                    <div class="accordion-item bg-dark border-light">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#basicInfo" aria-expanded="true" aria-controls="basicInfo">
+                                Informações Básicas
+                            </button>
+                        </h2>
+                        <div id="basicInfo" class="accordion-collapse collapse show" data-bs-parent="#wordDetailsAccordion">
+                            <div class="accordion-body text-light">
+                                <div class="mb-2">
+                                    <strong>Categoria:</strong> <span class="category">-</span>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Raiz:</strong> <span class="root">-</span>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Gênero:</strong> <span class="gender">-</span>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Número:</strong> <span class="number">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notas -->
+                    <div class="accordion-item bg-dark border-light">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#notesInfo" aria-expanded="false" aria-controls="notesInfo">
+                                Notas
+                            </button>
+                        </h2>
+                        <div id="notesInfo" class="accordion-collapse collapse" data-bs-parent="#wordDetailsAccordion">
+                            <div class="accordion-body text-light notes">
+                                -
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Referências -->
+                    <div class="accordion-item bg-dark border-light">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#referencesInfo" aria-expanded="false" aria-controls="referencesInfo">
+                                Referências Cruzadas
+                            </button>
+                        </h2>
+                        <div id="referencesInfo" class="accordion-collapse collapse" data-bs-parent="#wordDetailsAccordion">
+                            <div class="accordion-body text-light">
+                                <div class="references">
+                                    <p class="text-muted">Nenhuma referência encontrada.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ocorrências -->
+                    <div class="accordion-item bg-dark border-light">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#occurrencesInfo" aria-expanded="false" aria-controls="occurrencesInfo">
+                                Ocorrências (<span class="total-occurrences">0</span>)
+                            </button>
+                        </h2>
+                        <div id="occurrencesInfo" class="accordion-collapse collapse" data-bs-parent="#wordDetailsAccordion">
+                            <div class="accordion-body text-light">
+                                <div class="verses">
+                                    <p class="text-muted">Nenhum versículo encontrado.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.getElementById('searchForm');
+    const wordsList = document.getElementById('wordsList');
+    const csrftoken = '{{ csrf_token }}';
+
+    // Função para carregar palavras
+    function loadWords(query = '', category = '') {
+        wordsList.innerHTML = '<div class="alert alert-info">Carregando palavras...</div>';
+        
+        fetch(`{% url 'dictionary:search_words' %}?q=${query}&category=${category}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.words && data.words.length > 0) {
+                    wordsList.innerHTML = data.words.map(word => `
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="word-info text-center">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="word-item">
+                                                <span class="form-label">Aramaico: </span>
+                                                <span class="aramaic-text">${word.aramaic_word}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 border-start">
+                                            <div class="word-item">
+                                                <span class="form-label">Transliteração: </span>
+                                                <span class="transliteracao">${word.transliteration}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 border-start">
+                                            <div class="word-item">
+                                                <span class="form-label">Tradução: </span>
+                                                <span class="traducao">${word.portuguese_translation}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-2 d-flex justify-content-start gap-2">
+                                    <button class="btn btn-sm btn-outline-primary morphology-btn" onclick="showWordDetails(${word.id})">
+                                        <i class="bi bi-search"></i> Ver morfologia
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    wordsList.innerHTML = '<div class="alert alert-info">Nenhuma palavra encontrada.</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                wordsList.innerHTML = '<div class="alert alert-danger">Erro ao carregar palavras. Por favor, tente novamente.</div>';
+            });
+    }
+
+    // Event listener para o formulário de busca
+    searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const query = this.querySelector('input[name="q"]').value;
+        const category = this.querySelector('select[name="category"]').value;
+        loadWords(query, category);
+    });
+
+    // Carregar palavras assim que a página carregar
+    loadWords();
+});
+
+function showWordDetails(wordId) {
+    fetch(`{% url 'dictionary:word_details' word_id=0 %}`.replace('0', wordId))
+        .then(response => response.json())
+        .then(data => {
+            const content = document.getElementById('wordDetailsContent');
+            const offcanvas = document.getElementById('wordDetailsOffcanvas');
+            
+            // Atualiza o título
+            content.querySelector('.aramaic-text').textContent = data.aramaic_word || '';
+            
+            // Atualiza informações básicas
+            content.querySelector('.transliteracao').textContent = data.transliteration || '';
+            content.querySelector('.traducao').textContent = data.portuguese_translation || '';
+            content.querySelector('.category').textContent = data.grammatical_category || '-';
+            content.querySelector('.root').textContent = data.root_word || '-';
+            content.querySelector('.gender').textContent = data.gender || '-';
+            content.querySelector('.number').textContent = data.number || '-';
+            content.querySelector('.notes').textContent = data.notes || '-';
+            
+            // Atualiza referências
+            const referencesContent = content.querySelector('.references');
+            if (data.references && data.references.length > 0) {
+                referencesContent.innerHTML = data.references.map(ref => 
+                    `<div class="mb-2">${ref.context}</div>`
+                ).join('');
+            } else {
+                referencesContent.innerHTML = '<p class="text-muted">Nenhuma referência encontrada.</p>';
+            }
+            
+            // Atualiza ocorrências
+            content.querySelector('.total-occurrences').textContent = data.total_occurrences || '0';
+            
+            const versesEl = content.querySelector('.verses');
+            if (data.occurrences && data.occurrences.length > 0) {
+                versesEl.innerHTML = data.occurrences.map(verse => `
+                    <div class="mb-3">
+                        <div class="fw-bold">${verse.reference}</div>
+                        <div class="small">${verse.text}</div>
+                    </div>
+                `).join('');
+            } else {
+                versesEl.innerHTML = '<p class="text-muted">Nenhum versículo encontrado.</p>';
+            }
+            
+            // Abre o offcanvas
+            const bsOffcanvas = new bootstrap.Offcanvas(offcanvas);
+            bsOffcanvas.show();
+        })
+        .catch(error => {
+            console.error('Erro ao carregar detalhes:', error);
+            alert('Erro ao carregar detalhes da palavra');
+        });
+}
+
+// Adicionar atributos do offcanvas aos botões de morfologia se o usuário estiver autenticado
+const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+if (isAuthenticated) {
+    document.querySelectorAll('.morphology-btn').forEach(button => {
+        button.setAttribute('data-bs-toggle', 'offcanvas');
+        button.setAttribute('data-bs-target', '#wordDetailsOffcanvas');
+    });
+}
+</script>
+{% endblock extra_js %}

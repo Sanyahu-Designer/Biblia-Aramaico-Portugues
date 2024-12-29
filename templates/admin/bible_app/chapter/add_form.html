@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Adicionar Capítulo - {{ book.name }}</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="book" value="{{ book.id }}">
+        
+        <div class="form-row">
+            <label for="id_number">Número do Capítulo:</label>
+            <input type="number" name="number" id="id_number" required>
+        </div>
+        
+        <div class="submit-row">
+            <input type="submit" value="Salvar" class="default">
+            <a href="{% url 'admin:book_chapters' book.id %}" class="button">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

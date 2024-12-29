@@ -1,0 +1,63 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'admin/css/changelists.css' %}">
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:bible_app_book_changelist' %}">Livros</a>
+    &rsaquo; {{ book.name }} - Capítulos
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="module filtered">
+        <div class="changelist-form-container">
+            <div class="results">
+                <div class="admin-tools">
+                    <h1>{{ book.name }} - Capítulos</h1>
+                    {% if has_add_permission %}
+                    <div class="object-tools">
+                        <a href="{% url 'admin:add_chapter' book.id %}" class="addlink">
+                            Adicionar Capítulo
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <table id="result_list">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Versículos</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for chapter in chapters %}
+                        <tr class="{% cycle 'row1' 'row2' %}">
+                            <td>{{ chapter.number }}</td>
+                            <td>{{ chapter.verses.count }}</td>
+                            <td>
+                                <a href="{% url 'admin:chapter_verses' chapter.id %}" 
+                                   class="button">Ver Versículos</a>
+                                <a href="{% url 'admin:bible_app_chapter_change' chapter.id %}"
+                                   class="button">Editar</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3">Nenhum capítulo encontrado.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

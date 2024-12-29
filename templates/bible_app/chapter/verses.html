@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'bible_app/css/verse_styles.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'bible_app:home' %}?book={{ chapter.book.id }}">{{ chapter.book.name }}</a></li>
+            <li class="breadcrumb-item active">Capítulo {{ chapter.number }}</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">{{ chapter.book.name }} - Capítulo {{ chapter.number }}</h4>
+            {% if user.is_authenticated %}
+            <a href="{% url 'bible_app:add_verse' chapter.id %}" class="btn btn-primary">
+                Adicionar Versículo
+            </a>
+            {% endif %}
+        </div>
+        
+        <div class="card-body">
+            <div class="verses-container">
+                {% for verse in verses %}
+                <div class="card verse-card">
+                    <div class="verse-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 verse-reference">{{ chapter.book.name }} {{ chapter.number }}:{{ verse.number }}</h5>
+                        <div class="verse-actions">
+                            <button class="btn btn-outline-secondary btn-sm copy-verse" title="Copiar versículo">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm print-verse ms-2" title="Imprimir versículo">
+                                <i class="bi bi-printer"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="verse-content">
+                        <div class="text-section aramaic-text">
+                            <h6 class="text-muted">Texto em Aramaico:</h6>
+                            <p class="hebrew-font">{{ verse.aramaic_text }}</p>
+                        </div>
+                        <div class="text-section portuguese-text">
+                            <h6 class="text-muted">Tradução em Português:</h6>
+                            <p>{{ verse.portuguese_text }}</p>
+                        </div>
+                        {% if user.is_authenticated %}
+                        <div class="text-end mt-3">
+                            <a href="{% url 'bible_app:edit_verse' verse.id %}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-center">Nenhum versículo encontrado neste capítulo.</p>
+                {% endfor %}
+            </div>
+
+            <div class="navigation-buttons">
+                <div class="d-flex justify-content-between align-items-center">
+                    {% if previous_chapter %}
+                    <a href="{% url 'bible_app:chapter_verses' previous_chapter.id %}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left"></i> Capítulo {{ previous_chapter.number }}
+                    </a>
+                    {% else %}
+                    <div></div>
+                    {% endif %}
+
+                    {% if next_chapter %}
+                    <a href="{% url 'bible_app:chapter_verses' next_chapter.id %}" class="btn btn-outline-primary">
+                        Capítulo {{ next_chapter.number }} <i class="bi bi-arrow-right"></i>
+                    </a>
+                    {% else %}
+                    <div></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'bible_app/js/verse_interactions.js' %}"></script>
+{% endblock %}

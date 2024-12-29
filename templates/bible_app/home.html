@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+{% csrf_token %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'bible_app/css/verse_styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/tooltip.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+    @font-face {
+        font-family: 'Estrangelo Edessa';
+        src: url('{% static "fonts/estrangelo-edessa.woff2" %}') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    .aramaic-text {
+        font-family: 'Estrangelo Edessa', sans-serif;
+        font-size: 1.5rem;
+        line-height: 2;
+        text-align: right;
+        direction: rtl;
+    }
+
+    .verse-metadata {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+    .translator-note {
+        background-color: #f8f9fa;
+        border-left: 3px solid #6c757d;
+        padding: 0.75rem;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #495057;
+    }
+    .translator-note-header {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    .portuguese-text p {
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    .important-notice {
+        max-width: 800px;
+        margin: 2rem auto 3rem;
+        padding: 2rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+    }
+    .important-notice h2 {
+        color: #4682b4;
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    .important-notice p {
+        color: #495057;
+        line-height: 1.8;
+        margin-bottom: 1rem;
+        text-align: justify;
+    }
+    .important-notice p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Estilos dos menus suspensos */
+    .select-container {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        border: 1px solid var(--border);
+        background-color: var(--background);
+        color: var(--text);
+        cursor: pointer;
+    }
+
+    .form-select:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb), 0.25);
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .select-container {
+            margin-bottom: 1.25rem;
+            padding: 0 0.5rem;
+        }
+
+        .form-select {
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+    }
+
+    /* Tema escuro */
+    [data-theme="dark"] .form-select {
+        background-color: var(--background-dark);
+        border-color: var(--border-dark);
+        color: var(--text-dark);
+    }
+
+    [data-theme="dark"] .form-select:focus {
+        border-color: var(--primary-dark);
+        box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb-dark), 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main role="main">
+    <section class="container mt-4">
+        <form class="row mb-4" role="search" method="get" action="" id="bible-form">
+            <div class="col-md-6">
+                <div class="select-container">
+                    <label for="book-select" class="visually-hidden">Selecione um Livro</label>
+                    <select id="book-select" name="book" class="form-select" aria-label="Selecione um Livro">
+                        <option value="">Selecione um Livro</option>
+                        {% for book in books %}
+                        <option value="{{ book.id }}" {% if book.id|stringformat:"s" == selected_book_id %}selected{% endif %}>
+                            {{ book.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="select-container">
+                    <label for="chapter-select" class="visually-hidden">Selecione um Capítulo</label>
+                    <select id="chapter-select" name="chapter" class="form-select" aria-label="Selecione um Capítulo" {% if not selected_book_id %}disabled{% endif %}>
+                        <option value="">Selecione um Capítulo</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+
+        {% if verses %}
+        <section class="verses-container" aria-label="Versículos">
+            {% for verse in verses %}
+            <article class="card verse-card mb-4">
+                <header class="verse-header d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0 verse-reference">{{ verse.chapter.book.name }} {{ verse.chapter.number }}:{{ verse.number }}</h2>
+                    <div class="verse-actions">
+                        <button type="button" class="btn btn-outline-secondary btn-sm copy-verse" title="Copiar versículo" aria-label="Copiar versículo">
+                            <i class="bi bi-clipboard" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm print-verse ms-2" title="Imprimir versículo" aria-label="Imprimir versículo">
+                            <i class="bi bi-printer" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </header>
+                <div class="verse-content">
+                    <div class="text-section">
+                        <h3 class="h6 text-muted"><strong><em>Texto em Aramaico:</em></strong></h3>
+                        <p class="aramaic-text" lang="arc" dir="rtl">{{ verse.aramaic_text }}</p>
+                    </div>
+                    <div class="text-section portuguese-text">
+                        <h3 class="h6 text-muted"><strong><em>Tradução em Português:</em></strong></h3>
+                        <div lang="pt-BR">{{ verse.processed_portuguese_text|safe }}</div>
+                    </div>
+                    {% if verse.translator_note %}
+                    <div class="translator-note">
+                        <div class="translator-note-header">Nota do Tradutor:</div>
+                        <p>{{ verse.translator_note }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="verse-metadata">
+                        <small>Fonte: {{ verse.get_aramaic_source_display }}</small>
+                        <small>Tradução: {{ verse.get_translator_display }}</small>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </section>
+
+        <nav class="navigation-buttons mt-4" aria-label="Navegação entre capítulos">
+            <div class="d-flex justify-content-between align-items-center">
+                {% if previous_chapter %}
+                <a href="/?book={{ previous_chapter.book.id }}&chapter={{ previous_chapter.id }}" 
+                   class="btn btn-outline-primary"
+                   rel="prev">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                    <span>Capítulo {{ previous_chapter.number }}</span>
+                </a>
+                {% else %}
+                <div></div>
+                {% endif %}
+
+                {% if next_chapter %}
+                <a href="/?book={{ next_chapter.book.id }}&chapter={{ next_chapter.id }}" 
+                   class="btn btn-outline-primary"
+                   rel="next">
+                    <span>Capítulo {{ next_chapter.number }}</span>
+                    <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </a>
+                {% else %}
+                <div></div>
+                {% endif %}
+            </div>
+        </nav>
+        {% else %}
+        <div class="text-center mt-5">
+            <h2 class="h3">Selecione um livro e capítulo para visualizar os versículos</h2>
+            
+            <div class="important-notice">
+                <h2>Aviso Importante</h2>
+                <p>Estamos dedicando nossos esforços diariamente para oferecer traduções diretas do aramaico para o português. Esse é um processo cuidadoso e minucioso, que busca garantir a precisão e fidelidade dos textos. As traduções são realizadas a partir dos manuscritos antigos, como os Evangelhos Curetonianos Siríacos, o Palimpsesto Sinaítico Siríaco Antigo e a Peshitta.</p>
+                <p>A princípio, serão traduzidos apenas os manuscritos dos livros de Mateus, Marcos, Lucas e João. Vale ressaltar que a tradução de um único versículo pode levar dias para ser concluída corretamente, devido ao cuidado necessário com cada palavra e significado.</p>
+                <p>Agradecemos a sua compreensão e paciência enquanto trabalhamos para entregar um conteúdo de qualidade e com o máximo de autenticidade.</p>
+            </div>
+        </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const selectedChapterId = '{{ selected_chapter_id }}';
+    
+    // Função para carregar os versículos
+    function loadVerses() {
+        const form = document.getElementById('bible-form');
+        if (form.chapter.value) {
+            form.submit();
+        }
+    }
+    
+    // Evento para quando um capítulo é selecionado
+    document.getElementById('chapter-select').addEventListener('change', loadVerses);
+</script>
+<script src="{% static 'js/bible_navigation.js' %}"></script>
+<script src="{% static 'bible_app/js/verse_interactions.js' %}"></script>
+<script src="{% static 'js/tooltip.js' %}"></script>
+{% endblock %}

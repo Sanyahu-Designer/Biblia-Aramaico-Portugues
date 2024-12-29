@@ -1,0 +1,134 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+    }
+    
+    .stats-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .stats-header {
+        font-size: 1.2em;
+        color: #666;
+        margin-bottom: 15px;
+    }
+    
+    .stats-value {
+        font-size: 2em;
+        font-weight: bold;
+        color: #447e9b;
+    }
+    
+    .stats-label {
+        color: #666;
+        font-size: 0.9em;
+    }
+    
+    .chart-container {
+        margin-top: 30px;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Dashboard de Desempenho do Cache</h1>
+    
+    <div class="stats-container">
+        <div class="stats-card">
+            <div class="stats-header">Taxa de Acerto do Cache</div>
+            <div class="stats-value">{{ hit_rate }}%</div>
+            <div class="stats-label">
+                Acertos: {{ content_stats.hit }} / 
+                Falhas: {{ content_stats.miss }}
+            </div>
+        </div>
+        
+        <div class="stats-card">
+            <div class="stats-header">Total de Requisições</div>
+            <div class="stats-value">{{ total_requests }}</div>
+            <div class="stats-label">Desde o início do monitoramento</div>
+        </div>
+    </div>
+    
+    <div class="chart-container">
+        <h2>Acertos e Falhas do Cache (Últimos 7 dias)</h2>
+        {% if daily_stats %}
+        <canvas id="dailyStatsChart"></canvas>
+        {% else %}
+        <div class="no-data">
+            Ainda não há dados suficientes para exibir o gráfico.
+            Continue navegando pelo site para gerar estatísticas.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const dailyStats = {{ daily_stats|safe }};
+    
+    if (dailyStats && dailyStats.length > 0) {
+        new Chart(document.getElementById('dailyStatsChart'), {
+            type: 'line',
+            data: {
+                labels: dailyStats.map(stat => stat.date),
+                datasets: [
+                    {
+                        label: 'Acertos',
+                        data: dailyStats.map(stat => stat.hits),
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Falhas',
+                        data: dailyStats.map(stat => stat.misses),
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

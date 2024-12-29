@@ -1,0 +1,16 @@
+{
+  "name": "django-bible-project",
+  "version": "1.0.0",
+  "description": "Biblical passages in Aramaic with Brazilian Portuguese translations",
+  "scripts": {
+    "start": "python3 manage.py runserver",
+    "migrate": "python3 manage.py migrate",
+    "makemigrations": "python3 manage.py makemigrations",
+    "createsuperuser": "python3 manage.py createsuperuser",
+    "collectstatic": "python3 manage.py collectstatic --noinput"
+  },
+  "dependencies": {
+    "whitenoise": "^6.6.0",
+    "redis": "^4.6.13"
+  }
+}

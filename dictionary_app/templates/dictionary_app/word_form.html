@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ word.aramaic_word|default:"Nova Palavra" }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">{% if word %}Editar{% else %}Nova{% endif %} Palavra</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="wordForm">
+                        {% csrf_token %}
+                        
+                        <!-- Campo oculto para armazenar ocorrências detectadas -->
+                        <input type="hidden" name="detected_occurrences" id="detectedOccurrences" value="[]">
+                        
+                        <!-- Palavra em Aramaico -->
+                        <div class="mb-3">
+                            <label for="aramaic_word" class="form-label">Palavra em Aramaico</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="aramaic_word" name="aramaic_word" value="{{ word.aramaic_word|default:'' }}" required>
+                                <button type="button" class="btn btn-outline-primary" id="detectOccurrencesBtn">
+                                    <i class="bi bi-search"></i> Detectar Ocorrências
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Transliteração -->
+                        <div class="mb-3">
+                            <label for="transliteration" class="form-label">Transliteração</label>
+                            <input type="text" class="form-control" id="transliteration" name="transliteration" value="{{ word.transliteration|default:'' }}" required>
+                        </div>
+                        
+                        <!-- Tradução em Português -->
+                        <div class="mb-3">
+                            <label for="portuguese_translation" class="form-label">Tradução em Português</label>
+                            <input type="text" class="form-control" id="portuguese_translation" name="portuguese_translation" value="{{ word.portuguese_translation|default:'' }}" required>
+                        </div>
+                        
+                        <!-- Categoria Gramatical -->
+                        <div class="mb-3">
+                            <label for="grammatical_category" class="form-label">Categoria Gramatical</label>
+                            <select class="form-select" id="grammatical_category" name="grammatical_category">
+                                <option value="">Selecione...</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" {% if word.grammatical_category_id == category.id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Gênero e Número -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="gender" class="form-label">Gênero</label>
+                                    <select class="form-select" id="gender" name="gender">
+                                        <option value="">Selecione...</option>
+                                        {% for value, label in gender_choices %}
+                                        <option value="{{ value }}" {% if word.gender == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="number" class="form-label">Número</label>
+                                    <select class="form-select" id="number" name="number">
+                                        <option value="">Selecione...</option>
+                                        {% for value, label in number_choices %}
+                                        <option value="{{ value }}" {% if word.number == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Anotações -->
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Anotações</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ word.notes|default:'' }}</textarea>
+                        </div>
+                        
+                        <!-- Preview de Ocorrências -->
+                        <div class="mb-3" id="occurrencesPreview" style="display: none;">
+                            <label class="form-label">Ocorrências Detectadas</label>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <strong>Total de ocorrências: </strong>
+                                        <span id="totalOccurrences">0</span>
+                                    </div>
+                                    <div id="occurrencesList" class="list-group list-group-flush">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botões -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'dictionary:home' %}" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const detectBtn = document.getElementById('detectOccurrencesBtn');
+    const occurrencesPreview = document.getElementById('occurrencesPreview');
+    const totalOccurrences = document.getElementById('totalOccurrences');
+    const occurrencesList = document.getElementById('occurrencesList');
+    const detectedOccurrencesInput = document.getElementById('detectedOccurrences');
+    
+    detectBtn.addEventListener('click', function() {
+        const word = document.getElementById('aramaic_word').value;
+        if (!word) {
+            alert('Por favor, insira uma palavra em aramaico primeiro.');
+            return;
+        }
+        
+        // Mostrar loading
+        detectBtn.disabled = true;
+        detectBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Detectando...';
+        
+        // Fazer requisição para detectar ocorrências
+        fetch(`{% url 'dictionary:detect_occurrences' %}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                word: word
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Atualizar preview
+            totalOccurrences.textContent = data.total;
+            occurrencesList.innerHTML = data.occurrences.map(occ => `
+                <div class="list-group-item">
+                    <strong>${occ.reference}</strong>
+                    <p class="mb-0 text-muted small">${occ.text}</p>
+                </div>
+            `).join('');
+            
+            // Armazenar ocorrências no input oculto
+            detectedOccurrencesInput.value = JSON.stringify(data.occurrences);
+            
+            // Mostrar preview
+            occurrencesPreview.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Erro ao detectar ocorrências:', error);
+            alert('Erro ao detectar ocorrências. Por favor, tente novamente.');
+        })
+        .finally(() => {
+            // Restaurar botão
+            detectBtn.disabled = false;
+            detectBtn.innerHTML = '<i class="bi bi-search"></i> Detectar Ocorrências';
+        });
+    });
+});
+</script>
+{% endblock %}
