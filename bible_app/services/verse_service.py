@@ -33,9 +33,14 @@ class VerseService:
         verses = filter_by_text(
             verses, 
             search_text, 
-            ['aramaic_text', 'portuguese_text', 'translator_note']
+            [
+                'aramaic_text',
+                'portuguese_text',
+                'translator_note',
+                'chapter__book__name',  # Nome do livro
+            ]
         )
-        return paginate_queryset(verses, page)
+        return paginate_queryset(verses, 10, page)  # 10 resultados por página
 
     @staticmethod
     def create_verse(chapter, number: int, aramaic_text: str, portuguese_text: str, 

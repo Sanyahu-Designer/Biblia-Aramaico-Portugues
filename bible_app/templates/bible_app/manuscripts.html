@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manuscritos | Bíblia em Aramaico{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <article class="manuscripts-content">
+        <h1 class="text-center mb-4">Manuscritos e Fontes para Tradução do Aramaico: Informações e Contextos Históricos</h1>
+
+        <div class="introduction mb-4">
+            <p class="lead">
+                Esta página é dedicada à explicação detalhada das fontes históricas utilizadas para a tradução do Aramaico para o Português. Aqui, destacamos três dos mais importantes manuscritos siríacos: o Palimpsesto Sinaítico Siríaco Antigo, a Peshitta, e os Antigos Evangelhos Curetonianos Siríacos. Essas fontes são cruciais para entender o texto original das Escrituras e sua transmissão ao longo dos séculos.
+            </p>
+        </div>
+
+        <section class="manuscript-section mb-5">
+            <h2>Palimpsesto Sinaítico Siríaco Antigo</h2>
+            <p>O Palimpsesto Sinaítico, também conhecido como Codex Sinaiticus Syriacus, é um dos manuscritos mais antigos dos Evangelhos em Siríaco. Ele foi escrito no século IV ou V d.C. e redescoberto no mosteiro de Santa Catarina, no Monte Sinai, em 1892, pelas estudiosas Agnes Smith Lewis e Margaret Dunlop Gibson.</p>
+
+            <h3>O que é um palimpsesto?</h3>
+            <p>Um palimpsesto é um manuscrito no qual o texto original foi apagado ou raspado para reutilização do pergaminho. No caso do Palimpsesto Sinaítico, o texto bíblico subjacente foi parcialmente apagado e substituído por textos litúrgicos, mas técnicas modernas permitiram sua recuperação.</p>
+
+            <h3>Conteúdo e Importância</h3>
+            <p>O manuscrito contém trechos dos Evangelhos de Mateus, Marcos, Lucas e João, escritos em Siríaco Antigo, uma tradução mais próxima do idioma original falado por Jesus e seus discípulos. Sua relevância está na preservação de variantes textuais que não aparecem em versões gregas posteriores, fornecendo insights valiosos para estudiosos e tradutores.</p>
+        </section>
+
+        <section class="manuscript-section mb-5">
+            <h2>Peshitta</h2>
+            <p>A Peshitta (do siríaco ܦܫܝܛܬܐ, que significa "simples" ou "clara") é a versão padrão da Bíblia em Siríaco e ocupa um lugar central na tradição cristã oriental.</p>
+
+            <h3>Datação e Origem</h3>
+            <p>A Peshitta foi compilada entre os séculos II e V d.C. Embora a origem exata seja debatida, acredita-se que o Antigo Testamento foi traduzido diretamente do Hebraico, enquanto o Novo Testamento foi baseado em manuscritos gregos antigos.</p>
+
+            <h3>Características</h3>
+            <ul>
+                <li>Antigo Testamento: Traduzido diretamente do texto hebraico, incluindo livros deuterocanônicos.</li>
+                <li>Novo Testamento: A Peshitta omite livros como II Pedro, II João, III João, Judas e Apocalipse, refletindo um cânone mais restrito adotado pelas igrejas siríacas.</li>
+            </ul>
+
+            <h3>Significado para a Tradução</h3>
+            <p>A Peshitta oferece um texto estável e amplamente utilizado, sendo uma das principais referências para reconstruções do texto bíblico em idiomas modernos, incluindo o Português.</p>
+        </section>
+
+        <section class="manuscript-section mb-5">
+            <h2>Antigos Evangelhos Curetonianos Siríacos</h2>
+            <p>Os Evangelhos Curetonianos são uma coleção de manuscritos siríacos contendo partes dos Evangelhos de Mateus, Marcos, Lucas e João. Eles foram descobertos em um mosteiro no Egito e publicados por William Cureton em 1858, de onde deriva seu nome.</p>
+
+            <h3>Datação e História</h3>
+            <p>Esses manuscritos datam do século V d.C. e são considerados representativos de uma tradição siríaca antiga, distinta tanto do Palimpsesto Sinaítico quanto da Peshitta.</p>
+
+            <h3>Características Textuais</h3>
+            <p>Os Evangelhos Curetonianos apresentam um texto siríaco que preserva variantes únicas, algumas das quais podem refletir tradições anteriores às versões gregas predominantes. Assim, eles são uma fonte indispensável para comparar diferenças linguísticas e teológicas no texto bíblico.</p>
+        </section>
+
+        <section class="conclusion mb-5">
+            <h2>Conclusão</h2>
+            <p>A tradução do Aramaico para o Português exige um estudo profundo dessas fontes históricas, cada uma com sua importância singular:</p>
+            <ul>
+                <li>O Palimpsesto Sinaítico preserva uma versão antiga e menos influenciada pelos textos gregos.</li>
+                <li>A Peshitta representa a tradição textual consolidada e amplamente aceita no cristianismo oriental.</li>
+                <li>Os Evangelhos Curetonianos oferecem um vislumbre de variantes siríacas únicas e anteriores.</li>
+            </ul>
+            <p>Esses manuscritos não apenas corroboram a fidelidade textual de nossas traduções, mas também enriquecem a compreensão dos textos sagrados no contexto de sua origem histórica.</p>
+        </section>
+    </article>
+</div>
+
+<style>
+    .manuscripts-content {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .manuscript-section {
+        background-color: var(--bg-color);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .manuscript-section h2 {
+        color: var(--text-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .manuscript-section h3 {
+        color: var(--text-color);
+        margin-top: 20px;
+        margin-bottom: 15px;
+    }
+
+    .manuscript-section p {
+        line-height: 1.6;
+        color: var(--text-color);
+    }
+
+    .manuscript-section ul {
+        padding-left: 20px;
+        margin-bottom: 20px;
+    }
+
+    .manuscript-section li {
+        margin-bottom: 10px;
+        color: var(--text-color);
+    }
+
+    @media (max-width: 768px) {
+        .manuscripts-content {
+            padding: 10px;
+        }
+
+        .manuscript-section {
+            padding: 15px;
+        }
+    }
+</style>
+{% endblock %}

@@ -10,15 +10,16 @@ class BibleService:
 
     @staticmethod
     def get_chapters(book_id: int) -> list:
-        """Get chapters for a specific book with formatted display."""
+        """Get all chapters for a specific book.
+        
+        Args:
+            book_id (int): ID of the book
+            
+        Returns:
+            list: List of chapters with their IDs and numbers
+        """
         chapters = Chapter.objects.filter(book_id=book_id).order_by('number')
-        return [
-            {
-                'id': chapter.id,
-                'number': f"Capítulo {chapter.number}"
-            }
-            for chapter in chapters
-        ]
+        return [{'id': chapter.id, 'number': chapter.number} for chapter in chapters]
 
     @staticmethod
     def get_chapter_context(chapter_id: int) -> dict:
@@ -73,3 +74,33 @@ class BibleService:
                 'previous_chapter': None,
                 'next_chapter': None
             }
+
+    @staticmethod
+    def search_verses(query: str) -> list:
+        """Busca versículos que contenham o texto especificado.
+        
+        Args:
+            query (str): Texto a ser buscado
+            
+        Returns:
+            list: Lista de resultados com título e texto
+        """
+        from django.db.models import Q
+        
+        if not query:
+            return []
+
+        verses = Verse.objects.filter(
+            Q(text__icontains=query) |  # Busca no texto do versículo
+            Q(chapter__book__name__icontains=query)  # Busca no nome do livro
+        ).select_related('chapter', 'chapter__book')[:10]  # Limita a 10 resultados
+
+        results = []
+        for verse in verses:
+            results.append({
+                'url': f'/?book={verse.chapter.book.id}&chapter={verse.chapter.id}',
+                'title': f'{verse.chapter.book.name} {verse.chapter.number}:{verse.number}',
+                'text': verse.text
+            })
+
+        return results

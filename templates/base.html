@@ -15,68 +15,94 @@
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
     <link href="{% static 'css/banner.css' %}" rel="stylesheet">
+    <link href="{% static 'bible_app/css/search.css' %}" rel="stylesheet">
     {% block extra_css %}{% endblock %}
 </head>
 <body class="d-flex flex-column h-100">
     {% csrf_token %}
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'bible_app:home' %}">Evangelhos Aramaico Siríaco</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'bible_app:home' %}">
-                            <i class="bi bi-book"></i> Bíblia
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dictionary:home' %}">
-                            <i class="bi bi-journal-text"></i> Dicionário
-                        </a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle"></i>
-                                {{ user.username }}
+    <header>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{% url 'bible_app:home' %}">Evangelhos Aramaico Siríaco</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'bible_app:home' %}">
+                                <i class="bi bi-book"></i> Versículos
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                {% if user.is_staff %}
-                                <li>
-                                    <a class="dropdown-item" href="/admin/">
-                                        <i class="bi bi-gear"></i> Administração
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                {% endif %}
-                                <li>
-                                    <form method="post" action="{% url 'admin:logout' %}">
-                                        {% csrf_token %}
-                                        <button type="submit" class="dropdown-item">
-                                            <i class="bi bi-box-arrow-right"></i> Sair
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
                         </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <button class="btn nav-link" id="themeToggle">
-                            <i class="bi bi-moon-stars"></i>
-                        </button>
-                    </li>
-                </ul>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'bible_app:manuscripts' %}">
+                                <i class="bi bi-file-text"></i> Manuscritos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dictionary:home' %}">
+                                <i class="bi bi-journal-text"></i> Dicionário
+                            </a>
+                        </li>
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto">
+                        {% if user.is_authenticated %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle"></i>
+                                    {{ user.username }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    {% if user.is_staff %}
+                                    <li>
+                                        <a class="dropdown-item" href="/admin/">
+                                            <i class="bi bi-gear"></i> Administração
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    {% endif %}
+                                    <li>
+                                        <form method="post" action="{% url 'admin:logout' %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-box-arrow-right"></i> Sair
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <button class="btn nav-link" id="themeToggle">
+                                <i class="bi bi-moon-stars"></i> Tema
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="search-wrapper pt-4 pb-0">
+            <div class="search-container position-relative mx-auto" style="max-width: 600px;">
+                <div class="input-group shadow">
+                    <input type="text" id="searchInput" class="form-control border-0" placeholder="Pesquisar...">
+                    <button id="searchClear" class="btn" type="button">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+                <div id="searchResults" class="search-results">
+                    <div class="list-group"></div>
+                </div>
             </div>
         </div>
-    </nav>
+
+        {% block banner %}{% endblock %}
+    </header>
 
     <!-- Conteúdo -->
     <main>
@@ -88,7 +114,7 @@
     <!-- Footer -->
     <footer class="footer mt-auto py-3">
         <div class="container text-center">
-            <span>Todos os direitos reservados &copy; 2024 | Tradutores: Yosef Chaim e Netzer Netzarim | Desenvolvido por <a href="https://github.com/sanyahu" target="_blank">Sanyahu Designer</a></span>
+            <span>Todos os direitos reservados &copy; 2024 | Tradutores: Yosef Chaim e Netzer Netzarim | Desenvolvido por <a href="https://sanyahudesigner.com.br" target="_blank">Sanyahu Designer</a></span>
         </div>
     </footer>
 
@@ -144,6 +170,7 @@
     </script>
     
     {% block extra_js %}{% endblock %}
+    <script src="{% static 'js/search.js' %}"></script>
     <!-- Banner Manager -->
     <script src="{% static 'js/banner-manager.js' %}"></script>
     <style>

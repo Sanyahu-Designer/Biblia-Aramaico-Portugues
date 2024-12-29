@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator, EmptyPage
+from django.db.models import Q
 
 def filter_by_text(queryset, search_text, fields):
     """
@@ -12,9 +13,10 @@ def filter_by_text(queryset, search_text, fields):
     Retorna:
         QuerySet: O queryset filtrado.
     """
+    q_objects = Q()
     for field in fields:
-        queryset = queryset.filter(**{f"{field}__icontains": search_text})
-    return queryset
+        q_objects |= Q(**{f"{field}__icontains": search_text})
+    return queryset.filter(q_objects)
 
 def paginate_queryset(queryset, page_size, page_number):
     """
@@ -30,7 +32,6 @@ def paginate_queryset(queryset, page_size, page_number):
     """
     paginator = Paginator(queryset, page_size)
     try:
-        page = paginator.page(page_number)
+        return paginator.page(page_number)
     except EmptyPage:
-        page = paginator.page(paginator.num_pages)
-    return page
+        return paginator.page(1)

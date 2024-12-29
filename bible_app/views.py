@@ -30,3 +30,13 @@ def get_chapters(request):
         chapters = BibleService.get_chapters(book_id)
         return JsonResponse(list(chapters), safe=False)
     return JsonResponse({'error': 'Book ID is required'}, status=400)
+
+def search(request):
+    """API endpoint para buscar versículos."""
+    query = request.GET.get('q', '').strip()
+    if not query:
+        return JsonResponse({'results': []})
+    
+    bible_service = BibleService()
+    results = bible_service.search_verses(query)
+    return JsonResponse({'results': results})

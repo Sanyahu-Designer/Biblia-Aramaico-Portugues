@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from bible_app.services.bible_service import BibleService
 from bible_app.services.chapter_service import ChapterService
 from bible_app.services.preferences_service import PreferencesService
+from bible_app.models import Chapter, Verse
 
 def get_chapters(request):
     """API endpoint to get chapters for a specific book."""
@@ -17,6 +18,16 @@ def get_chapters(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+def search(request):
+    """API endpoint para buscar versículos."""
+    query = request.GET.get('q', '').strip()
+    if not query:
+        return JsonResponse({'results': []})
+    
+    bible_service = BibleService()
+    results = bible_service.search_verses(query)
+    return JsonResponse({'results': results})
+
 def home(request):
     """Handle the home page view with Bible navigation."""
     bible_service = BibleService()
@@ -25,18 +36,13 @@ def home(request):
     
     print("DEBUG - Request params:", request.GET)
     
-    # Debug - Verificar dados no banco
-    from bible_app.models import Book, Chapter, Verse
-    books_count = Book.objects.count()
-    chapters_count = Chapter.objects.count()
-    verses_count = Verse.objects.count()
-    print(f"DEBUG - Database counts: Books={books_count}, Chapters={chapters_count}, Verses={verses_count}")
-    
     selected_book_id = request.GET.get('book')
     selected_chapter_id = request.GET.get('chapter')
+    selected_verse = request.GET.get('verse')  # Novo parâmetro
     
     print("DEBUG - Selected book:", selected_book_id)
     print("DEBUG - Selected chapter:", selected_chapter_id)
+    print("DEBUG - Selected verse:", selected_verse)
     
     context = {
         'books': bible_service.get_books(),
@@ -56,15 +62,37 @@ def home(request):
     
     if selected_book_id and selected_chapter_id:
         try:
-            # Debug - Verificar versículos do capítulo específico
-            chapter = Chapter.objects.get(id=selected_chapter_id)
+            # Se vier da busca (tem versículo), usa o número do capítulo
+            if selected_verse:
+                chapter = Chapter.objects.get(
+                    book_id=selected_book_id,
+                    number=selected_chapter_id
+                )
+            else:
+                # Se for navegação normal, usa o ID do capítulo
+                chapter = Chapter.objects.get(
+                    id=selected_chapter_id,
+                    book_id=selected_book_id
+                )
+            
             print(f"DEBUG - Loading verses for chapter {chapter}")
             
-            verses = Verse.objects.filter(
-                chapter_id=selected_chapter_id
-            ).select_related('chapter', 'chapter__book').order_by('number')
+            # Base query
+            verses_query = Verse.objects.select_related('chapter', 'chapter__book')
             
-            verses_list = list(verses)
+            # Se tiver um versículo específico da busca, mostrar apenas ele
+            if selected_verse:
+                verses_query = verses_query.filter(
+                    chapter=chapter,
+                    number=selected_verse
+                )
+            else:
+                # Caso contrário, mostrar todos os versículos do capítulo
+                verses_query = verses_query.filter(
+                    chapter=chapter
+                )
+            
+            verses_list = list(verses_query.order_by('number'))
             print(f"DEBUG - Found {len(verses_list)} verses")
             
             if verses_list:

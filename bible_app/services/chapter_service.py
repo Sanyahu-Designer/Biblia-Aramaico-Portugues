@@ -4,9 +4,17 @@ from ..models import Chapter, Book
 
 class ChapterService:
     @staticmethod
-    def get_chapters_by_book(book_id: int) -> QuerySet:
-        """Get all chapters for a specific book."""
-        return Chapter.objects.filter(book_id=book_id).order_by('number')
+    def get_chapters_by_book(book_id: int) -> list:
+        """Get all chapters for a specific book.
+        
+        Args:
+            book_id (int): ID of the book
+            
+        Returns:
+            list: List of chapters with their IDs and numbers
+        """
+        chapters = Chapter.objects.filter(book_id=book_id).order_by('number')
+        return [{'id': chapter.id, 'number': chapter.number} for chapter in chapters]
     
     @staticmethod
     def get_chapter_by_id(chapter_id: int) -> Chapter:

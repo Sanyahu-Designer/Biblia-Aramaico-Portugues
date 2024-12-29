@@ -275,185 +275,296 @@
     [data-bs-theme="dark"] .verse-content {
         color: var(--bs-body-color);
     }
+
+    /* Estilos para os menus de seleção */
+    .form-select {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    @media (min-width: 576px) {
+        .form-select {
+            margin-bottom: 0;
+        }
+    }
+
+    /* Centralizar os menus em telas pequenas */
+    @media (max-width: 575.98px) {
+        .row.g-3 {
+            text-align: center;
+        }
+    }
+
+    /* Estilos para o dropdown */
+    .dropdown-menu {
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        transform: none !important;
+    }
+
+    .dropdown-menu.show {
+        display: block;
+    }
+
+    .form-select {
+        position: relative;
+    }
+
+    /* Estilos para os menus suspensos */
+    .dropdown {
+        position: relative;
+        width: 100%;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        width: 100%;
+        inset: auto 0 auto 0; /* Isso força o menu a usar a largura do container pai */
+    }
+
+    .dropdown-menu.show {
+        position: absolute !important;
+        transform: none !important;
+    }
+
+    .dropdown-item {
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        padding: 0.5rem 1rem;
+    }
+
+    /* Reset completo do posicionamento do dropdown */
+    .dropdown {
+        position: relative !important;
+    }
+    
+    .dropdown-menu {
+        position: absolute !important;
+        top: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        transform: none !important;
+        margin: 2px 0 0 0 !important;
+        max-height: 300px;
+        overflow-y: auto;
+        float: none !important;
+    }
+    
+    .dropdown-menu.show {
+        display: block !important;
+        position: absolute !important;
+        transform: none !important;
+    }
+
+    /* Novo estilo para a pesquisa */
+    .search-field {
+        position: fixed;
+        top: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 600px;
+        z-index: 1050;
+        background: var(--bs-body-bg);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .search-field input {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        outline: none;
+    }
+
+    .search-field .results {
+        position: absolute;
+        width: 100%;
+        background: var(--bs-body-bg);
+        border-radius: 0 0 8px 8px;
+        overflow: hidden;
+        display: none;
+    }
+
+    .search-field .results.visible {
+        display: block;
+    }
+
+    .search-field .result-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .search-field .result-item:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    [data-bs-theme="dark"] .search-field {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    [data-bs-theme="dark"] .search-field .result-item:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .search-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1040;
+        display: none;
+    }
+
+    .search-overlay.visible {
+        display: block;
+    }
+
+    [data-bs-theme="dark"] .dropdown-menu {
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        margin-top: 0.5rem !important;
+        transform: none !important;
+        max-height: 300px;
+        overflow-y: auto;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <main role="main">
-    <section class="container mt-4">
-        <form class="row mb-4" role="search">
-            <div class="col-md-6">
-                <label for="book-select" class="visually-hidden">Selecione um Livro</label>
-                <select id="book-select" class="form-select" aria-label="Selecione um Livro">
-                    <option value="">Selecione um Livro</option>
-                    {% for book in books %}
-                    <option value="{{ book.id }}" {% if book.id|stringformat:"s" == selected_book_id %}selected{% endif %}>
-                        {{ book.name }}
-                    </option>
-                    {% endfor %}
+    <div class="container mt-4">
+        <div class="row g-3 justify-content-center">
+            <!-- Seletor de Livro -->
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="book-select" data-bs-toggle="dropdown" aria-expanded="false">
+                        Selecione um Livro
+                    </button>
+                    <ul class="dropdown-menu w-100" aria-labelledby="book-select">
+                        {% for book in books %}
+                            <li><a class="dropdown-item" href="#" data-book-id="{{ book.id }}" {% if selected_book_id == book.id|stringformat:"s" %}selected{% endif %}>
+                                {{ book.name }}
+                            </a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Seletor de Capítulo -->
+            <div class="col-12 col-sm-6 col-md-4">
+                <select class="form-select" id="chapter-select" aria-label="Selecione um Capítulo" {% if not selected_book_id %}disabled{% endif %}>
+                    <option value="" selected>Capítulo</option>
                 </select>
-            </div>
-            <div class="col-md-6">
-                <label for="chapter-select" class="visually-hidden">Selecione um Capítulo</label>
-                <select id="chapter-select" class="form-select" aria-label="Selecione um Capítulo" {% if not selected_book_id %}disabled{% endif %}>
-                    <option value="">Selecione um Capítulo</option>
-                </select>
-            </div>
-        </form>
-
-        {% if verses %}
-        <section class="verses-container" aria-label="Versículos">
-            {% for verse in verses %}
-            <article class="card verse-card mb-4">
-                <header class="verse-header d-flex justify-content-between align-items-center">
-                    <h2 class="h5 mb-0 verse-reference">{{ verse.chapter.book.name }} {{ verse.chapter.number }}:{{ verse.number }}</h2>
-                    <div class="verse-actions">
-                        <button type="button" class="btn btn-outline-secondary btn-sm copy-verse" title="Copiar versículo" aria-label="Copiar versículo">
-                            <i class="bi bi-clipboard" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm print-verse ms-2" title="Imprimir versículo" aria-label="Imprimir versículo">
-                            <i class="bi bi-printer" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                </header>
-                <div class="verse-content">
-                    <div class="text-section">
-                        <p class="aramaic-text-header">Texto em Aramaico:</p>
-                        <p class="aramaic-text" lang="arc" dir="rtl">{{ verse.aramaic_text }}</p>
-                    </div>
-                    <div class="text-section portuguese-text">
-                        <p class="portuguese-text-header">Tradução em Português:</p>
-                        <div lang="pt-BR">{{ verse.portuguese_text|safe }}</div>
-                    </div>
-                    {% if verse.translator_note %}
-                    <div class="card mt-3 translator-note">
-                        <div class="card-body">
-                            <h6 class="card-subtitle mb-3 text-primary fw-bold">
-                                <i class="bi bi-pencil-square me-2"></i>
-                                Nota do Tradutor
-                            </h6>
-                            <div class="card-text">{{ verse.translator_note }}</div>
-                        </div>
-                    </div>
-                    {% endif %}
-                    <div class="verse-metadata">
-                        <small class="fonte-text">Fonte: {{ verse.get_aramaic_source_display }}</small>
-                        <small class="traducao-text">Tradução: {{ verse.get_translator_display }}</small>
-                    </div>
-                </div>
-            </article>
-            {% endfor %}
-        </section>
-
-        <nav class="navigation-buttons mt-4" aria-label="Navegação entre capítulos">
-            <div class="d-flex justify-content-between align-items-center">
-                {% if previous_chapter %}
-                <a href="/?book={{ previous_chapter.book.id }}&chapter={{ previous_chapter.id }}" 
-                   class="btn btn-outline-primary"
-                   rel="prev">
-                    <i class="bi bi-arrow-left" aria-hidden="true"></i>
-                    <span>Capítulo {{ previous_chapter.number }}</span>
-                </a>
-                {% else %}
-                <div></div>
-                {% endif %}
-
-                {% if next_chapter %}
-                <a href="/?book={{ next_chapter.book.id }}&chapter={{ next_chapter.id }}" 
-                   class="btn btn-outline-primary"
-                   rel="next">
-                    <span>Capítulo {{ next_chapter.number }}</span>
-                    <i class="bi bi-arrow-right" aria-hidden="true"></i>
-                </a>
-                {% else %}
-                <div></div>
-                {% endif %}
-            </div>
-        </nav>
-        {% else %}
-        <div class="text-center mt-5">
-            <h2 class="h3">Selecione um livro e capítulo para visualizar os versículos</h2>
-            
-            <div class="important-notice">
-                <div class="card-header">
-                    <h4 class="text-center mb-0">Aviso Importante</h4>
-                </div>
-                <div class="card-body">
-                    <p>Estamos dedicando nossos esforços diariamente para oferecer traduções diretas do aramaico para o português. Esse é um processo cuidadoso e minucioso, que busca garantir a precisão e fidelidade dos textos. As traduções são realizadas a partir dos manuscritos antigos, como os Evangelhos Curetonianos Siríacos, o Palimpsesto Sinaítico Siríaco Antigo e a Peshitta.</p>
-                    
-                    <p>A princípio, serão traduzidos apenas os manuscritos dos livros de Mateus, Marcos, Lucas e João. Vale ressaltar que a tradução de um único versículo pode levar dias para ser concluída corretamente, devido ao cuidado necessário com cada palavra e significado.</p>
-                    
-                    <p>Agradecemos a sua compreensão e paciência enquanto trabalhamos para entregar um conteúdo de qualidade e com o máximo de autenticidade.</p>
-                </div>
             </div>
         </div>
-        {% endif %}
-    </section>
+
+        <!-- Área dos versículos -->
+        <div class="mt-4">
+            <div id="verses-container">
+                {% if verses %}
+                    <div class="verses-section">
+                        {{ verses|safe }}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <h4>Selecione um livro e capítulo para visualizar os versículos</h4>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </main>
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/bible.js' %}"></script>
 <script>
-    const selectedChapterId = '{{ selected_chapter_id }}';
-</script>
-<script src="{% static 'js/bible_navigation.js' %}"></script>
-<script src="{% static 'bible_app/js/verse_interactions.js' %}"></script>
-<script src="{% static 'js/tooltip.js' %}"></script>
-
-<script>
-    function updateTranslatorNoteTheme() {
-        const isDarkTheme = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-        const translatorNotes = document.querySelectorAll('.translator-note');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Manipular clique nos itens do dropdown de livros
+        const dropdownItems = document.querySelectorAll('.dropdown-menu .dropdown-item');
+        const dropdownButton = document.querySelector('#book-select');
         
-        translatorNotes.forEach(note => {
-            if (isDarkTheme) {
-                note.style.backgroundColor = '#2b3035';
-                note.style.color = '#ffffff';
-                note.style.borderLeftColor = '#495057';
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const bookId = this.dataset.bookId;
+                const bookName = this.textContent.trim();
                 
-                const header = note.querySelector('.translator-note-title');
-                if (header) {
-                    header.style.color = '#ffffff';
-                }
+                // Atualizar o texto do botão
+                dropdownButton.textContent = bookName;
                 
-                const paragraph = note.querySelector('.translator-note-content');
-                if (paragraph) {
-                    paragraph.style.color = '#ffffff';
-                }
+                // Aqui você pode adicionar a lógica para carregar os capítulos
+                // baseado no bookId selecionado
+            });
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchField = document.querySelector('.search-field input');
+        const searchResults = document.querySelector('.search-field .results');
+        const searchOverlay = document.querySelector('.search-overlay');
+
+        // Mostrar overlay e resultados quando o campo recebe foco
+        searchField.addEventListener('focus', function() {
+            searchOverlay.classList.add('visible');
+            if (this.value.trim()) {
+                searchResults.classList.add('visible');
+            }
+        });
+
+        // Atualizar resultados conforme digita
+        searchField.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            if (query) {
+                // Exemplo de resultados (substitua pela sua lógica de busca real)
+                const results = [
+                    'Mateus 1:1 - Livro da genealogia de Jesus Cristo...',
+                    'Mateus 1:2 - Abraão gerou a Isaque...'
+                ];
+                
+                searchResults.innerHTML = results
+                    .map(result => `<div class="result-item">${result}</div>`)
+                    .join('');
+                    
+                searchResults.classList.add('visible');
             } else {
-                note.style.backgroundColor = '#f8f9fa';
-                note.style.color = '#495057';
-                note.style.borderLeftColor = '#6c757d';
-                
-                const header = note.querySelector('.translator-note-title');
-                if (header) {
-                    header.style.color = '#495057';
-                }
-                
-                const paragraph = note.querySelector('.translator-note-content');
-                if (paragraph) {
-                    paragraph.style.color = '#495057';
-                }
+                searchResults.classList.remove('visible');
             }
         });
-    }
 
-    // Observar mudanças no atributo data-bs-theme
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'data-bs-theme') {
-                updateTranslatorNoteTheme();
-            }
+        // Fechar pesquisa ao clicar fora
+        searchOverlay.addEventListener('click', function() {
+            searchOverlay.classList.remove('visible');
+            searchResults.classList.remove('visible');
+            searchField.blur();
+        });
+
+        // Prevenir que cliques dentro da pesquisa fechem ela
+        searchField.parentElement.addEventListener('click', function(e) {
+            e.stopPropagation();
         });
     });
-
-    // Iniciar observação
-    observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['data-bs-theme']
-    });
-
-    // Aplicar tema inicial
-    document.addEventListener('DOMContentLoaded', updateTranslatorNoteTheme);
 </script>
 {% endblock %}
+
+<div class="search-overlay"></div>
+<div class="search-field">
+    <input type="text" placeholder="Pesquisar versículos..." aria-label="Campo de pesquisa">
+    <div class="results"></div>
+</div>
