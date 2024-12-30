@@ -21,10 +21,7 @@ class BookSitemap(Sitemap):
         return Book.objects.all()
 
     def location(self, obj):
-        return reverse('bible_app:book_detail', args=[obj.slug])
-
-    def lastmod(self, obj):
-        return obj.updated_at
+        return reverse('bible_app:book_chapters', args=[obj.id])
 
 class ChapterSitemap(Sitemap):
     changefreq = "monthly"
@@ -34,10 +31,7 @@ class ChapterSitemap(Sitemap):
         return Chapter.objects.all()
 
     def location(self, obj):
-        return reverse('bible_app:chapter_detail', args=[obj.book.slug, obj.number])
-
-    def lastmod(self, obj):
-        return obj.updated_at
+        return reverse('bible_app:book_chapters', args=[obj.book.id])
 
 class VerseSitemap(Sitemap):
     changefreq = "monthly"
@@ -47,10 +41,7 @@ class VerseSitemap(Sitemap):
         return Verse.objects.all()
 
     def location(self, obj):
-        return reverse('bible_app:verse_detail', args=[obj.chapter.book.slug, obj.chapter.number, obj.number])
-
-    def lastmod(self, obj):
-        return obj.updated_at
+        return f'/verses/{obj.id}/'
 
 class WordSitemap(Sitemap):
     changefreq = "monthly"
@@ -60,7 +51,4 @@ class WordSitemap(Sitemap):
         return AramaicWord.objects.all()
 
     def location(self, obj):
-        return reverse('dictionary_app:word_detail', args=[obj.id])
-
-    def lastmod(self, obj):
-        return obj.updated_at
+        return f'/dictionary/word/{obj.id}/'
