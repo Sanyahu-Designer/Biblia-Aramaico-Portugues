@@ -5,33 +5,39 @@ from django.views.decorators.http import require_http_methods
 from django.db.models import Q, F
 from .models import AramaicWord, WordCrossReference, GrammaticalCategory, WordOccurrence, Verse
 from .services import WordOccurrenceService
+from . import settings as dict_settings
 import json
 
 def home(request):
     """View para a página inicial do dicionário."""
     categories = GrammaticalCategory.objects.all()
-    initial_words = AramaicWord.objects.all().order_by('aramaic_word')[:50]  # Carrega as 50 primeiras palavras
+    is_mobile = 'Mobile' in request.META.get('HTTP_USER_AGENT', '')
+    items_per_page = dict_settings.ITEMS_PER_PAGE_MOBILE if is_mobile else dict_settings.ITEMS_PER_PAGE_DESKTOP
+    initial_words = AramaicWord.objects.all().order_by('aramaic_word')[:items_per_page]
+    
     return render(request, 'dictionary_app/home.html', {
         'categories': categories,
-        'initial_words': initial_words
+        'initial_words': initial_words,
+        'items_per_page': items_per_page,
+        'total_words': AramaicWord.objects.count()
     })
 
 def search_words(request):
     """API para buscar palavras no dicionário."""
     try:
-        print("=== Início da busca de palavras ===")
-        print(f"Método da requisição: {request.method}")
-        print(f"Usuário autenticado: {request.user.is_authenticated}")
-        print(f"GET params: {request.GET}")
-        
         query = request.GET.get('q', '')
         category = request.GET.get('category', '')
+        page = int(request.GET.get('page', 1))
+        items_per_page = int(request.GET.get('items_per_page', dict_settings.ITEMS_PER_PAGE_DESKTOP))
         
-        print(f"Query: '{query}', Category: '{category}'")
+        # Limita o número máximo de itens por página
+        items_per_page = min(items_per_page, dict_settings.MAX_ITEMS_PER_LOAD)
+        
+        # Calcula o offset baseado na página
+        offset = (page - 1) * items_per_page
         
         words = AramaicWord.objects.all()
         total_words = words.count()
-        print(f"Total de palavras no banco: {total_words}")
         
         if query:
             words = words.filter(
@@ -39,41 +45,33 @@ def search_words(request):
                 Q(transliteration__icontains=query) |
                 Q(portuguese_translation__icontains=query)
             )
-            print(f"Após filtro de query: {words.count()} palavras")
         
         if category:
             words = words.filter(grammatical_category_id=category)
-            print(f"Após filtro de categoria: {words.count()} palavras")
         
-        results = []
-        words_list = list(words[:50])  # Limitando a 50 resultados
-        print(f"Processando {len(words_list)} palavras")
+        # Obtém o total de resultados para esta busca
+        total_filtered = words.count()
         
-        for word in words_list:
-            # Verifica favoritos apenas se o usuário estiver autenticado
-            is_favorite = False
-            if request.user.is_authenticated:
-                is_favorite = word.favorites.filter(id=request.user.id).exists()
-            
-            word_data = {
+        # Ordena e pagina os resultados
+        words = words.order_by('aramaic_word')[offset:offset + items_per_page]
+        
+        # Verifica se há mais resultados
+        has_more = (offset + items_per_page) < total_filtered
+        
+        return JsonResponse({
+            'words': [{
                 'id': word.id,
                 'aramaic_word': word.aramaic_word,
                 'transliteration': word.transliteration,
                 'portuguese_translation': word.portuguese_translation,
-                'category': word.grammatical_category.name if word.grammatical_category else None,
-                'is_favorite': is_favorite
-            }
-            results.append(word_data)
-            print(f"Processada palavra: {word.aramaic_word}")
-        
-        print(f"Total de resultados: {len(results)}")
-        print("=== Fim da busca de palavras ===")
-        return JsonResponse({'words': results})
+                'grammatical_category': word.grammatical_category.name if word.grammatical_category else None
+            } for word in words],
+            'total': total_filtered,
+            'has_more': has_more,
+            'current_page': page
+        })
     except Exception as e:
-        print(f"!!! ERRO ao buscar palavras: {str(e)}")
-        import traceback
-        print(traceback.format_exc())
-        return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({'error': str(e)}, status=400)
 
 @require_http_methods(["GET"])
 def word_details(request, word_id):

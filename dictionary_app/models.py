@@ -54,7 +54,7 @@ class WordOccurrence(models.Model):
     created_at = models.DateTimeField('Data de Criação', auto_now_add=True)
 
     def __str__(self):
-        return f"{self.word} em {self.verse.reference}"
+        return f"{self.word} em {self.verse}"
 
     class Meta:
         verbose_name = "Ocorrência"
