@@ -9,4 +9,4 @@ Disallow: /*.php$
 Disallow: /*/private/
 Disallow: /*?*
 
-Sitemap: https://seudominio.com/sitemap.xml
+Sitemap: https://staging.sanyahudesigner.com.br/sitemap.xml
