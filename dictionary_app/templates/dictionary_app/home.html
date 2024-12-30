@@ -180,7 +180,43 @@
         </div>
 
         <!-- Lista de palavras -->
-        <div id="wordsList"></div>
+        <div id="wordsList">
+            {% if initial_words %}
+                {% for word in initial_words %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="word-info text-center">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="word-item">
+                                            <span class="form-label">Aramaico: </span>
+                                            <span class="aramaic-text">{{ word.aramaic_word }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 border-start">
+                                        <div class="word-item">
+                                            <span class="form-label">Transliteração: </span>
+                                            <span class="transliteracao">{{ word.transliteration }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 border-start">
+                                        <div class="word-item">
+                                            <span class="form-label">Tradução: </span>
+                                            <span class="traducao">{{ word.portuguese_translation }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2 d-flex justify-content-start gap-2">
+                                <button class="btn btn-sm btn-outline-primary morphology-btn" onclick="DictionaryApp.showWordDetails({{ word.id }})">
+                                    <i class="bi bi-search"></i> Ver morfologia
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
     </div>
 
     <!-- Offcanvas -->
@@ -280,16 +316,32 @@
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchForm = document.getElementById('searchForm');
-    const wordsList = document.getElementById('wordsList');
-    const csrftoken = '{{ csrf_token }}';
-
-    // Função para carregar palavras
-    function loadWords(query = '', category = '') {
-        wordsList.innerHTML = '<div class="alert alert-info">Carregando palavras...</div>';
+const DictionaryApp = {
+    init: function() {
+        this.searchForm = document.getElementById('searchForm');
+        this.wordsList = document.getElementById('wordsList');
+        this.csrftoken = '{{ csrf_token }}';
+        this.bindEvents();
+    },
+    
+    bindEvents: function() {
+        this.searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const query = this.searchForm.querySelector('input[name="q"]').value;
+            const category = this.searchForm.querySelector('select[name="category"]').value;
+            this.loadWords(query, category);
+        });
+    },
+    
+    loadWords: function(query, category) {
+        // Se não houver query nem categoria selecionada, não faz nada para manter as palavras iniciais
+        if (!query && !category) {
+            return;
+        }
         
-        fetch(`{% url 'dictionary:search_words' %}?q=${query}&category=${category}`)
+        this.wordsList.innerHTML = '<div class="alert alert-info">Carregando palavras...</div>';
+        
+        fetch(`/dictionary/search/?q=${query}&category=${category}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -298,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 if (data.words && data.words.length > 0) {
-                    wordsList.innerHTML = data.words.map(word => `
+                    this.wordsList.innerHTML = data.words.map(word => `
                         <div class="card mb-3">
                             <div class="card-body">
                                 <div class="word-info text-center">
@@ -324,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                 </div>
                                 <div class="mt-2 d-flex justify-content-start gap-2">
-                                    <button class="btn btn-sm btn-outline-primary morphology-btn" onclick="showWordDetails(${word.id})">
+                                    <button class="btn btn-sm btn-outline-primary morphology-btn" onclick="DictionaryApp.showWordDetails(${word.id})">
                                         <i class="bi bi-search"></i> Ver morfologia
                                     </button>
                                 </div>
@@ -332,88 +384,37 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     `).join('');
                 } else {
-                    wordsList.innerHTML = '<div class="alert alert-info">Nenhuma palavra encontrada.</div>';
+                    this.wordsList.innerHTML = '<div class="alert alert-info">Nenhuma palavra encontrada.</div>';
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                wordsList.innerHTML = '<div class="alert alert-danger">Erro ao carregar palavras. Por favor, tente novamente.</div>';
+                this.wordsList.innerHTML = '<div class="alert alert-danger">Erro ao carregar palavras. Por favor, tente novamente.</div>';
+            });
+    },
+
+    showWordDetails: function(wordId) {
+        fetch(`/dictionary/word/${wordId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const content = document.querySelector('#wordDetailsContent');
+                content.querySelector('.aramaic-text').textContent = data.aramaic_word;
+                content.querySelector('.transliteracao').textContent = data.transliteration;
+                content.querySelector('.traducao').textContent = data.portuguese_translation;
+                
+                const offcanvas = new bootstrap.Offcanvas(document.getElementById('wordDetailsOffcanvas'));
+                offcanvas.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao carregar detalhes da palavra. Por favor, tente novamente.');
             });
     }
+};
 
-    // Event listener para o formulário de busca
-    searchForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const query = this.querySelector('input[name="q"]').value;
-        const category = this.querySelector('select[name="category"]').value;
-        loadWords(query, category);
-    });
-
-    // Carregar palavras assim que a página carregar
-    loadWords();
-});
-
-function showWordDetails(wordId) {
-    fetch(`{% url 'dictionary:word_details' word_id=0 %}`.replace('0', wordId))
-        .then(response => response.json())
-        .then(data => {
-            const content = document.getElementById('wordDetailsContent');
-            const offcanvas = document.getElementById('wordDetailsOffcanvas');
-            
-            // Atualiza o título
-            content.querySelector('.aramaic-text').textContent = data.aramaic_word || '';
-            
-            // Atualiza informações básicas
-            content.querySelector('.transliteracao').textContent = data.transliteration || '';
-            content.querySelector('.traducao').textContent = data.portuguese_translation || '';
-            content.querySelector('.category').textContent = data.grammatical_category || '-';
-            content.querySelector('.root').textContent = data.root_word || '-';
-            content.querySelector('.gender').textContent = data.gender || '-';
-            content.querySelector('.number').textContent = data.number || '-';
-            content.querySelector('.notes').textContent = data.notes || '-';
-            
-            // Atualiza referências
-            const referencesContent = content.querySelector('.references');
-            if (data.references && data.references.length > 0) {
-                referencesContent.innerHTML = data.references.map(ref => 
-                    `<div class="mb-2">${ref.context}</div>`
-                ).join('');
-            } else {
-                referencesContent.innerHTML = '<p class="text-muted">Nenhuma referência encontrada.</p>';
-            }
-            
-            // Atualiza ocorrências
-            content.querySelector('.total-occurrences').textContent = data.total_occurrences || '0';
-            
-            const versesEl = content.querySelector('.verses');
-            if (data.occurrences && data.occurrences.length > 0) {
-                versesEl.innerHTML = data.occurrences.map(verse => `
-                    <div class="mb-3">
-                        <div class="fw-bold">${verse.reference}</div>
-                        <div class="small">${verse.text}</div>
-                    </div>
-                `).join('');
-            } else {
-                versesEl.innerHTML = '<p class="text-muted">Nenhum versículo encontrado.</p>';
-            }
-            
-            // Abre o offcanvas
-            const bsOffcanvas = new bootstrap.Offcanvas(offcanvas);
-            bsOffcanvas.show();
-        })
-        .catch(error => {
-            console.error('Erro ao carregar detalhes:', error);
-            alert('Erro ao carregar detalhes da palavra');
-        });
-}
-
-// Adicionar atributos do offcanvas aos botões de morfologia se o usuário estiver autenticado
-const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
-if (isAuthenticated) {
-    document.querySelectorAll('.morphology-btn').forEach(button => {
-        button.setAttribute('data-bs-toggle', 'offcanvas');
-        button.setAttribute('data-bs-target', '#wordDetailsOffcanvas');
-    });
+// Inicializar apenas se estivermos na página do dicionário
+if (document.getElementById('searchForm')) {
+    DictionaryApp.init();
 }
 </script>
-{% endblock extra_js %}
+{% endblock %}

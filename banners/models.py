@@ -88,9 +88,12 @@ class Banner(models.Model):
         self.refresh_from_db()
 
     def incrementar_clicks(self):
-        from django.db.models import F
-        Banner.objects.filter(id=self.id).update(clicks=F('clicks') + 1)
-        self.refresh_from_db()
+        self.clicks += 1
+        self.save()
+
+    def incrementar_visualizacoes(self):
+        self.visualizacoes += 1
+        self.save()
 
     def get_image_url(self):
         if settings.DEBUG:

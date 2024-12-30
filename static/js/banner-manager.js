@@ -55,6 +55,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Função para registrar visualização
+    async function registerView(bannerId) {
+        try {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            await fetch(`/banners/api/register-view/${bannerId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            });
+        } catch (error) {
+            console.error('Error registering view:', error);
+        }
+    }
+
     // Função para esconder o banner
     function hideBanner() {
         if (bannerElement && bannerElement.parentNode) {
@@ -135,6 +151,15 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(bannerDiv);
         bannerVisible = true;
         bannerElement = bannerDiv;
+        
+        // Registra a visualização do banner após ele ser exibido
+        try {
+            await registerView(banner.id);
+            console.log('Banner view registered successfully');
+        } catch (error) {
+            console.error('Failed to register banner view:', error);
+        }
+        
         markBannerAsShown(); // Registra o momento em que o banner foi mostrado
     }
 

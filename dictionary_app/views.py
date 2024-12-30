@@ -10,7 +10,11 @@ import json
 def home(request):
     """View para a página inicial do dicionário."""
     categories = GrammaticalCategory.objects.all()
-    return render(request, 'dictionary_app/home.html', {'categories': categories})
+    initial_words = AramaicWord.objects.all().order_by('aramaic_word')[:50]  # Carrega as 50 primeiras palavras
+    return render(request, 'dictionary_app/home.html', {
+        'categories': categories,
+        'initial_words': initial_words
+    })
 
 def search_words(request):
     """API para buscar palavras no dicionário."""

@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /static/
+Allow: /media/
+
+Disallow: /admin/
+Disallow: /tmp/
+Disallow: /*.php$
+Disallow: /*/private/
+Disallow: /*?*
+
+Sitemap: https://seudominio.com/sitemap.xml

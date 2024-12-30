@@ -77,6 +77,19 @@ def register_click(request, banner_id):
         logger.error(f'Error in register_click: {str(e)}')
         return JsonResponse({'error': str(e)}, status=500)
 
+@csrf_protect
+@require_http_methods(["POST"])
+def register_view(request, banner_id):
+    try:
+        banner = Banner.objects.get(id=banner_id)
+        banner.incrementar_visualizacoes()
+        return JsonResponse({'success': True})
+    except Banner.DoesNotExist:
+        return JsonResponse({'error': 'Banner not found'}, status=404)
+    except Exception as e:
+        logger.error(f'Error in register_view: {str(e)}')
+        return JsonResponse({'error': str(e)}, status=500)
+
 def serve_banner_image(request, filename):
     try:
         file_path = os.path.join(settings.MEDIA_ROOT, 'banners', filename)

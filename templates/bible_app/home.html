@@ -120,6 +120,22 @@
 </style>
 {% endblock %}
 
+{% block search_bar %}
+<div class="search-wrapper pt-4 pb-0">
+    <div class="search-container position-relative mx-auto" style="max-width: 600px;">
+        <div class="input-group shadow">
+            <input type="text" id="searchInput" class="form-control border-0" placeholder="Pesquisar em todos os versículos...">
+            <button id="searchClear" class="btn" type="button">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        <div id="searchResults" class="search-results">
+            <div class="list-group"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <main role="main">
     <section class="container mt-4">
@@ -228,21 +244,32 @@
 {% endblock %}
 
 {% block extra_js %}
+{% if verses %}
+<script src="{% static 'js/search.js' %}"></script>
+{% endif %}
 <script>
-    const selectedChapterId = '{{ selected_chapter_id }}';
-    
-    // Função para carregar os versículos
-    function loadVerses() {
-        const form = document.getElementById('bible-form');
-        if (form.chapter.value) {
-            form.submit();
-        }
-    }
-    
-    // Evento para quando um capítulo é selecionado
-    document.getElementById('chapter-select').addEventListener('change', loadVerses);
+    // Definir variável globalmente antes de carregar os outros scripts
+    window.selectedChapterId = '{{ selected_chapter_id }}';
 </script>
 <script src="{% static 'js/bible_navigation.js' %}"></script>
+<script src="{% static 'js/search.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar busca
+        SearchApp.init();
+        
+        // Função para carregar os versículos
+        function loadVerses() {
+            const form = document.getElementById('bible-form');
+            if (form.chapter.value) {
+                form.submit();
+            }
+        }
+        
+        // Evento para quando um capítulo é selecionado
+        document.getElementById('chapter-select').addEventListener('change', loadVerses);
+    });
+</script>
 <script src="{% static 'bible_app/js/verse_interactions.js' %}"></script>
 <script src="{% static 'js/tooltip.js' %}"></script>
 {% endblock %}

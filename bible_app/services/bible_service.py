@@ -91,7 +91,8 @@ class BibleService:
             return []
 
         verses = Verse.objects.filter(
-            Q(text__icontains=query) |  # Busca no texto do versículo
+            Q(aramaic_text__icontains=query) |  # Busca no texto aramaico
+            Q(portuguese_text__icontains=query) |  # Busca no texto em português
             Q(chapter__book__name__icontains=query)  # Busca no nome do livro
         ).select_related('chapter', 'chapter__book')[:10]  # Limita a 10 resultados
 
@@ -100,7 +101,7 @@ class BibleService:
             results.append({
                 'url': f'/?book={verse.chapter.book.id}&chapter={verse.chapter.id}',
                 'title': f'{verse.chapter.book.name} {verse.chapter.number}:{verse.number}',
-                'text': verse.text
+                'text': verse.portuguese_text
             })
-
+        
         return results

@@ -87,20 +87,16 @@
             </div>
         </nav>
         
-        <div class="search-wrapper pt-4 pb-0">
-            <div class="search-container position-relative mx-auto" style="max-width: 600px;">
-                <div class="input-group shadow">
-                    <input type="text" id="searchInput" class="form-control border-0" placeholder="Pesquisar...">
-                    <button id="searchClear" class="btn" type="button">
-                        <i class="bi bi-x"></i>
-                    </button>
-                </div>
-                <div id="searchResults" class="search-results">
-                    <div class="list-group"></div>
-                </div>
-            </div>
-        </div>
+        {% block search_bar %}{% endblock %}
 
+        {% if messages %}
+            <div class="alert alert-success">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
         {% block banner %}{% endblock %}
     </header>
 
@@ -170,7 +166,6 @@
     </script>
     
     {% block extra_js %}{% endblock %}
-    <script src="{% static 'js/search.js' %}"></script>
     <!-- Banner Manager -->
     <script src="{% static 'js/banner-manager.js' %}"></script>
     <style>
