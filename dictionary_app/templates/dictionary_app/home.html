@@ -367,6 +367,7 @@ const DictionaryApp = {
     hasMore: true,
     lastQuery: '',
     lastCategory: '',
+    offcanvas: null,
 
     init: function() {
         this.wordsList = document.getElementById('wordsList');
@@ -374,6 +375,7 @@ const DictionaryApp = {
         this.itemsPerPageSelect = document.getElementById('itemsPerPage');
         this.prevPageBtn = document.getElementById('prevPage');
         this.nextPageBtn = document.getElementById('nextPage');
+        this.offcanvas = new bootstrap.Offcanvas(document.getElementById('wordDetailsOffcanvas'));
         
         this.bindEvents();
         this.updatePaginationButtons();
@@ -503,7 +505,12 @@ const DictionaryApp = {
 
     showWordDetails: function(wordId) {
         fetch(`/dictionary/word/${wordId}/details/`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 const content = document.querySelector('#wordDetailsContent');
                 content.querySelector('.aramaic-text').textContent = data.aramaic_word;
@@ -527,8 +534,28 @@ const DictionaryApp = {
                     content.querySelector('.notes').textContent = data.notes;
                 }
                 
-                const offcanvas = new bootstrap.Offcanvas(document.getElementById('wordDetailsOffcanvas'));
-                offcanvas.show();
+                // Atualiza referências
+                const referencesDiv = content.querySelector('.references');
+                if (data.references && data.references.length > 0) {
+                    referencesDiv.innerHTML = data.references.map(ref => 
+                        `<p>${ref.context}</p>`
+                    ).join('');
+                } else {
+                    referencesDiv.innerHTML = '<p class="text-muted">Nenhuma referência encontrada.</p>';
+                }
+                
+                // Atualiza ocorrências
+                content.querySelector('.total-occurrences').textContent = data.total_occurrences || 0;
+                const versesDiv = content.querySelector('.verses');
+                if (data.occurrences && data.occurrences.length > 0) {
+                    versesDiv.innerHTML = data.occurrences.map(occ => 
+                        `<p><strong>${occ.reference}:</strong> ${occ.text}</p>`
+                    ).join('');
+                } else {
+                    versesDiv.innerHTML = '<p class="text-muted">Nenhum versículo encontrado.</p>';
+                }
+                
+                this.offcanvas.show();
             })
             .catch(error => {
                 console.error('Error:', error);
