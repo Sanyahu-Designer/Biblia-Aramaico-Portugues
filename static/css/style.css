@@ -123,6 +123,44 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 991px) {
+    .navbar-collapse {
+        position: fixed;
+        right: -250px;
+        top: 0;
+        height: 100vh;
+        width: 250px;
+        transition: right 0.3s ease;
+        z-index: 1045;
+        padding: 1rem;
+        background-color: #ffffff;
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-bs-theme="dark"] .navbar-collapse {
+        background-color: var(--navbar-dark);
+    }
+
+    .navbar-collapse.show {
+        right: 0;
+    }
+
+    .close-menu {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1046;
+    }
+
+    [data-bs-theme="light"] .navbar-collapse .nav-link {
+        color: var(--text-light) !important;
+    }
+
+    [data-bs-theme="light"] .navbar-collapse .nav-link:hover {
+        color: var(--primary) !important;
+    }
+}
+
 .navbar-brand,
 .navbar-nav .nav-link {
     color: rgba(255, 255, 255, 0.9) !important;
